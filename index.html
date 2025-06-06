@@ -100,13 +100,6 @@
             color: #34495e;
         }
 
-        .value-display {
-            font-weight: 700;
-            font-size: 1.1em;
-            color: #2c3e50;
-            min-width: 100px;
-            text-align: right;
-        }
 
         .slider-container {
             display: flex;
@@ -203,28 +196,48 @@
             outline: none;
         }
 
-        .value-input {
-            width: 80px;
-            padding: 5px 8px;
-            border: 2px solid #dfe6e9;
+        .value-display {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #2c3e50;
+            min-width: 100px;
+            text-align: right;
+            border: 2px solid transparent;
             border-radius: 5px;
-            font-size: 0.9em;
-            text-align: center;
-            transition: border-color 0.3s ease;
+            padding: 4px 8px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .value-display:hover {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #dfe6e9;
+        }
+
+        .value-display:focus {
             background: white;
-        }
-
-        .value-input:focus {
-            border-color: #3498db;
             outline: none;
+            cursor: text;
         }
 
-        .ev-section .value-input:focus {
+        .ev-section .value-display:focus {
             border-color: #3498db;
         }
 
-        .petrol-section .value-input:focus {
+        .petrol-section .value-display:focus {
             border-color: #e74c3c;
+        }
+
+        /* Hide number input spinner arrows */
+        .value-display::-webkit-outer-spin-button,
+        .value-display::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .value-display[type=number] {
+            -moz-appearance: textfield;
         }
 
         .equivalence-display {
@@ -315,11 +328,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Efficiency</span>
-                        <span class="value-display" id="ev-efficiency-display">4.0 mi/kWh</span>
+                        <input type="number" class="value-display" id="ev-efficiency-display" value="4.0" step="0.1" min="0.1">
                     </div>
                     <div class="slider-container">
                         <input type="range" id="ev-efficiency" min="1" max="10" step="0.1" value="4">
-                        <input type="number" id="ev-efficiency-input" class="value-input" min="0.1" step="0.1" value="4">
                         <input type="checkbox" class="lock-checkbox" id="lock-ev-efficiency">
                     </div>
                 </div>
@@ -327,11 +339,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Electricity Cost</span>
-                        <span class="value-display" id="ev-cost-display">55.0 p/kWh</span>
+                        <input type="number" class="value-display" id="ev-cost-display" value="55.0" step="0.1" min="0.1">
                     </div>
                     <div class="slider-container">
                         <input type="range" id="ev-cost" min="0.1" max="150" step="0.1" value="55">
-                        <input type="number" id="ev-cost-input" class="value-input" min="0.1" step="0.1" value="55">
                         <input type="checkbox" class="lock-checkbox" id="lock-ev-cost">
                     </div>
                 </div>
@@ -346,11 +357,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Efficiency</span>
-                        <span class="value-display" id="petrol-efficiency-display">44.0 mpg</span>
+                        <input type="number" class="value-display" id="petrol-efficiency-display" value="44.0" step="0.1" min="0.1">
                     </div>
                     <div class="slider-container">
                         <input type="range" id="petrol-efficiency" min="1" max="200" step="0.1" value="44">
-                        <input type="number" id="petrol-efficiency-input" class="value-input" min="0.1" step="0.1" value="44">
                         <input type="checkbox" class="lock-checkbox" id="lock-petrol-efficiency">
                     </div>
                 </div>
@@ -358,11 +368,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Fuel Cost</span>
-                        <span class="value-display" id="petrol-cost-display">133.9 p/L</span>
+                        <input type="number" class="value-display" id="petrol-cost-display" value="133.9" step="0.1" min="0.1">
                     </div>
                     <div class="slider-container">
                         <input type="range" id="petrol-cost" min="10" max="200" step="0.1" value="133.9">
-                        <input type="number" id="petrol-cost-input" class="value-input" min="0.1" step="0.1" value="133.9">
                         <input type="checkbox" class="lock-checkbox" id="lock-petrol-cost">
                     </div>
                 </div>
@@ -466,10 +475,6 @@
             evCost: document.getElementById('ev-cost'),
             petrolEfficiency: document.getElementById('petrol-efficiency'),
             petrolCost: document.getElementById('petrol-cost'),
-            evEfficiencyInput: document.getElementById('ev-efficiency-input'),
-            evCostInput: document.getElementById('ev-cost-input'),
-            petrolEfficiencyInput: document.getElementById('petrol-efficiency-input'),
-            petrolCostInput: document.getElementById('petrol-cost-input'),
             evEfficiencyDisplay: document.getElementById('ev-efficiency-display'),
             evCostDisplay: document.getElementById('ev-cost-display'),
             petrolEfficiencyDisplay: document.getElementById('petrol-efficiency-display'),
@@ -631,10 +636,10 @@
 
         // Update displays
         function updateDisplays() {
-            elements.evEfficiencyDisplay.textContent = formatEvEfficiency(state.evEfficiency, state.evEfficiencyUnit);
-            elements.evCostDisplay.textContent = `${state.evCost.toFixed(1)} ${formatEnergy(state.energyUnit)}`;
-            elements.petrolEfficiencyDisplay.textContent = formatFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit);
-            elements.petrolCostDisplay.textContent = `${state.petrolCost.toFixed(1)} ${formatVolume(state.volumeUnit)}`;
+            elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(1);
+            elements.evCostDisplay.value = state.evCost.toFixed(1);
+            elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
+            elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
             
             const costPerMile = calculateEvCostPerMile();
             const costPerKm = costPerMile / MILES_PER_KM;
@@ -723,7 +728,6 @@
                     targetEfficiency = convertFuelEfficiency(targetEfficiency, 'mpgUK', state.fuelEfficiencyUnit);
                     state.petrolEfficiency = Math.max(0.1, targetEfficiency);
                     elements.petrolEfficiency.value = state.petrolEfficiency;
-                    elements.petrolEfficiencyInput.value = state.petrolEfficiency;
                 } else if (adjustableParams.includes('petrolCost')) {
                     let mpgUK = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK');
                     let targetCostPerLitre = (evCostPerMile * mpgUK) / LITRES_PER_UK_GALLON;
@@ -737,7 +741,6 @@
                     
                     state.petrolCost = Math.max(0.1, targetCost);
                     elements.petrolCost.value = state.petrolCost;
-                    elements.petrolCostInput.value = state.petrolCost;
                 }
             } else {
                 // Petrol side changed, adjust EV side
@@ -755,7 +758,6 @@
                     targetEfficiency = convertEvEfficiency(targetEfficiency, 'mi/kWh', state.evEfficiencyUnit);
                     state.evEfficiency = Math.max(0.1, targetEfficiency);
                     elements.evEfficiency.value = state.evEfficiency;
-                    elements.evEfficiencyInput.value = state.evEfficiency;
                 } else if (adjustableParams.includes('evCost')) {
                     let targetCost = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
                     if (state.includeChargingLosses) {
@@ -769,7 +771,6 @@
                     
                     state.evCost = Math.max(0.1, targetCost);
                     elements.evCost.value = state.evCost;
-                    elements.evCostInput.value = state.evCost;
                 }
             }
             
@@ -801,8 +802,8 @@
             updateDisplays();
         });
 
-        // Number input event listeners
-        elements.evEfficiencyInput.addEventListener('input', (e) => {
+        // Value display input event listeners
+        elements.evEfficiencyDisplay.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.evEfficiency = value;
@@ -812,7 +813,7 @@
             }
         });
 
-        elements.evCostInput.addEventListener('input', (e) => {
+        elements.evCostDisplay.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.evCost = value;
@@ -822,7 +823,7 @@
             }
         });
 
-        elements.petrolEfficiencyInput.addEventListener('input', (e) => {
+        elements.petrolEfficiencyDisplay.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.petrolEfficiency = value;
@@ -832,7 +833,7 @@
             }
         });
 
-        elements.petrolCostInput.addEventListener('input', (e) => {
+        elements.petrolCostDisplay.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.petrolCost = value;
@@ -950,7 +951,6 @@
             }
             
             elements.evCost.value = state.evCost;
-            elements.evCostInput.value = state.evCost;
             updateSliderRanges();
             updateDisplays();
         });
@@ -977,7 +977,6 @@
             }
             
             elements.petrolCost.value = state.petrolCost;
-            elements.petrolCostInput.value = state.petrolCost;
             updateDisplays();
         });
 
@@ -991,7 +990,6 @@
             
             updateSliderRanges();
             elements.evEfficiency.value = state.evEfficiency;
-            elements.evEfficiencyInput.value = state.evEfficiency;
             updateDisplays();
         });
 
@@ -1005,7 +1003,6 @@
             
             updateSliderRanges();
             elements.petrolEfficiency.value = state.petrolEfficiency;
-            elements.petrolEfficiencyInput.value = state.petrolEfficiency;
             updateDisplays();
         });
 
