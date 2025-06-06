@@ -282,8 +282,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>EV vs Petrol Calculator</h1>
-        <p class="subtitle">Compare fuel costs between electric and petrol vehicles</p>
+        <h1>EV vs ICE Calculator</h1>
+        <p class="subtitle">Compare fuel costs between electric and internal combustion vehicles</p>
 
 ```
     <div class="calculator-grid">
@@ -319,7 +319,7 @@
         <div class="section petrol-section">
             <h2 class="section-title">
                 <span class="icon">⛽</span>
-                Petrol Vehicle
+                Internal Combustion
             </h2>
             
             <div class="slider-group">
@@ -360,24 +360,51 @@
     <div class="unit-selector">
         <h3 style="margin-bottom: 15px; color: #34495e;">Unit Preferences</h3>
         <div class="unit-group">
+            <span class="unit-label">Distance:</span>
+            <select id="distance-unit" class="unit-select">
+                <option value="miles">Miles</option>
+                <option value="km">Kilometers</option>
+            </select>
+        </div>
+        <div class="unit-group">
+            <span class="unit-label">Energy:</span>
+            <select id="energy-unit" class="unit-select">
+                <option value="kWh">Kilowatt-hours (kWh)</option>
+                <option value="Wh">Watt-hours (Wh)</option>
+            </select>
+        </div>
+        <div class="unit-group">
+            <span class="unit-label">Volume:</span>
+            <select id="volume-unit" class="unit-select">
+                <option value="L">Litres</option>
+                <option value="galUK">UK Gallons</option>
+                <option value="galUS">US Gallons</option>
+            </select>
+        </div>
+        <div class="unit-group">
             <span class="unit-label">EV Efficiency:</span>
             <select id="ev-efficiency-unit" class="unit-select">
                 <option value="mi/kWh">miles/kWh</option>
+                <option value="km/kWh">km/kWh</option>
                 <option value="kWh/100mi">kWh/100mi</option>
+                <option value="kWh/100km">kWh/100km</option>
                 <option value="Wh/mi">Wh/mile</option>
+                <option value="Wh/km">Wh/km</option>
             </select>
         </div>
         <div class="unit-group">
             <span class="unit-label">Fuel Efficiency:</span>
             <select id="fuel-efficiency-unit" class="unit-select">
-                <option value="mpg">mpg (UK)</option>
+                <option value="mpgUK">mpg (UK)</option>
+                <option value="mpgUS">mpg (US)</option>
+                <option value="km/L">km/L</option>
                 <option value="L/100km">L/100km</option>
             </select>
         </div>
     </div>
 
     <div class="equivalence-display" id="equivalence-display">
-        Equivalent cost per mile
+        Cost per mile: 0.00p
     </div>
 </div>
 
@@ -677,7 +704,85 @@
         updateDisplays();
     });
 
-    // Unit selectorss
+    // Unit selectors
+    elements.distanceUnit.addEventListener('change', (e) => {
+        state.distanceUnit = e.target.value;
+        updateEvEfficiencyOptions();
+        updateFuelEfficiencyOptions();
+        updateSliderRanges();
+        updateDisplays();
+    });
+
+    elements.energyUnit.addEventListener('change', (e) => {
+        const oldUnit = state.energyUnit;
+        state.energyUnit = e.target.value;
+        
+        // Convert EV cost between Wh and kWh
+        if (oldUnit === 'kWh' && state.energyUnit === 'Wh') {
+            state.evCost = state.evCost / 10;
+        } else if (oldUnit === 'Wh' && state.energyUnit === 'kWh') {
+            state.evCost = state.evCost * 10;
+        }
+        
+        elements.evCost.value = state.evCost;
+        updateEvEfficiencyOptions();
+        updateSliderRanges();
+        updateDisplays();
+    });
+
+    elements.volumeUnit.addEventListener('change', (e) => {
+        const oldUnit = state.volumeUnit;
+        state.volumeUnit = e.target.value;
+        
+        // Convert petrol cost between units
+        state.petrolCost = convertVolume(state.petrolCost / 100, oldUnit, state.volumeUnit) * 100;
+        elements.petrolCost.value = state.petrolCost;
+        
+        updateFuelEfficiencyOptions();
+        updateDisplays();
+    });
+
+    elements.evEfficiencyUnit.addEventListener('change', (e) => {
+        const oldUnit = state.evEfficiencyUnit;
+        const newUnit = e.target.value;
+        
+        // Convert the current value to the new unit
+        state.evEfficiency = convertEvEfficiency(state.evEfficiency, oldUnit, newUnit);
+        state.evEfficiencyUnit = newUnit;
+        
+        updateSliderRanges();
+        elements.evEfficiency.value = state.evEfficiency;
+        updateDisplays();
+    });
+
+    elements.fuelEfficiencyUnit.addEventListener('change', (e) => {
+        const oldUnit = state.fuelEfficiencyUnit;
+        const newUnit = e.target.value;
+        
+        // Convert the current value to the new unit
+        state.petrolEfficiency = convertFuelEfficiency(state.petrolEfficiency, oldUnit, newUnit);
+        state.fuelEfficiencyUnit = newUnit;
+        
+        updateSliderRanges();
+        elements.petrolEfficiency.value = state.petrolEfficiency;
+        updateDisplays();
+    });
+
+    // Initialize
+    updateEvEfficiencyOptions();
+    updateFuelEfficiencyOptions();
+    updateSliderRanges();
+    updateDisplays();
+</script>
+    });
+
+    elements.chargingLossesInput.addEventListener('input', (e) => {
+        state.chargingLosses = parseFloat(e.target.value) || 0;
+        maintainEquivalence('chargingLosses');
+        updateDisplays();
+    });
+
+    // Unit selectors
     elements.evEfficiencyUnit.addEventListener('change', (e) => {
         const oldUnit = state.evEfficiencyUnit;
         const newUnit = e.target.value;
