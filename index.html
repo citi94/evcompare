@@ -308,40 +308,6 @@
             outline: none;
         }
 
-        .currency-selector {
-            margin-top: 20px;
-            padding: 15px;
-            background: #ecf0f1;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .currency-group {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .currency-label {
-            font-weight: 500;
-            color: #34495e;
-        }
-
-        .currency-select {
-            padding: 5px 10px;
-            border: 2px solid #dfe6e9;
-            border-radius: 5px;
-            font-size: 0.9em;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.3s ease;
-        }
-
-        .currency-select:focus {
-            border-color: #3498db;
-            outline: none;
-        }
 
         .unit-label {
             font-size: 0.9em;
@@ -388,7 +354,14 @@
                         <span class="label-text">Electricity Cost</span>
                         <div class="value-container">
                             <input type="number" class="value-display" id="ev-cost-display" value="55.0" step="0.1" min="0.1">
-                            <span class="unit-label" id="ev-cost-unit-label">p/kWh</span>
+                            <select id="ev-cost-unit" class="unit-select">
+                                <option value="p/kWh">p/kWh</option>
+                                <option value="¢/kWh">¢/kWh</option>
+                                <option value="c/kWh">c/kWh</option>
+                                <option value="p/Wh">p/Wh</option>
+                                <option value="¢/Wh">¢/Wh</option>
+                                <option value="c/Wh">c/Wh</option>
+                            </select>
                         </div>
                     </div>
                     <div class="slider-container">
@@ -454,16 +427,6 @@
             </div>
         </div>
 
-        <div class="currency-selector">
-            <div class="currency-group">
-                <span class="currency-label">Currency:</span>
-                <select id="currency-unit" class="currency-select">
-                    <option value="pence">Pence (p)</option>
-                    <option value="cents">Cents (¢)</option>
-                    <option value="eurocents">Euro cents (c)</option>
-                </select>
-            </div>
-        </div>
 
         <div class="equivalence-display" id="equivalence-display">
             Cost per mile: 0.00p
@@ -488,7 +451,7 @@
             evEfficiencyUnit: 'mi/kWh',
             fuelEfficiencyUnit: 'mpgUK',
             fuelCostUnit: 'L',
-            currency: 'pence'
+            evCostUnit: 'p/kWh'
         };
 
         let isUpdating = false; // Prevent circular updates
@@ -510,7 +473,7 @@
             evCostDisplay: document.getElementById('ev-cost-display'),
             petrolEfficiencyDisplay: document.getElementById('petrol-efficiency-display'),
             petrolCostDisplay: document.getElementById('petrol-cost-display'),
-            evCostUnitLabel: document.getElementById('ev-cost-unit-label'),
+            evCostUnit: document.getElementById('ev-cost-unit'),
             lockEvEfficiency: document.getElementById('lock-ev-efficiency'),
             lockEvCost: document.getElementById('lock-ev-cost'),
             lockPetrolEfficiency: document.getElementById('lock-petrol-efficiency'),
@@ -520,8 +483,7 @@
             equivalenceDisplay: document.getElementById('equivalence-display'),
             evEfficiencyUnit: document.getElementById('ev-efficiency-unit'),
             fuelEfficiencyUnit: document.getElementById('fuel-efficiency-unit'),
-            fuelCostUnit: document.getElementById('fuel-cost-unit'),
-            currencyUnit: document.getElementById('currency-unit')
+            fuelCostUnit: document.getElementById('fuel-cost-unit')
         };
 
         // Unit conversion functions
@@ -635,10 +597,10 @@
         }
 
 
-        function getCurrencySymbol() {
-            if (state.currency === 'pence') return 'p';
-            if (state.currency === 'cents') return '¢';
-            if (state.currency === 'eurocents') return 'c';
+        function getEvCostCurrencySymbol() {
+            if (state.evCostUnit.includes('p/')) return 'p';
+            if (state.evCostUnit.includes('¢/')) return '¢';
+            if (state.evCostUnit.includes('c/')) return 'c';
             return 'p';
         }
         
@@ -646,11 +608,51 @@
             return state.fuelCostUnit; // Now directly returns 'L', 'galUK', or 'galUS'
         }
         
+        function convertEvCost(value, fromUnit, toUnit) {
+            if (fromUnit === toUnit) return value;
+            
+            // Convert to standard unit (p/kWh) first
+            let pPerKwh = value;
+            
+            // From conversions to p/kWh
+            if (fromUnit === '¢/kWh') {
+                pPerKwh = value; // 1:1 conversion for display purposes
+            } else if (fromUnit === 'c/kWh') {
+                pPerKwh = value; // 1:1 conversion for display purposes
+            } else if (fromUnit === 'p/Wh') {
+                pPerKwh = value * 1000; // 1000 Wh = 1 kWh
+            } else if (fromUnit === '¢/Wh') {
+                pPerKwh = value * 1000;
+            } else if (fromUnit === 'c/Wh') {
+                pPerKwh = value * 1000;
+            }
+            
+            // To conversions from p/kWh
+            if (toUnit === 'p/kWh') {
+                return pPerKwh;
+            } else if (toUnit === '¢/kWh') {
+                return pPerKwh; // 1:1 conversion for display purposes
+            } else if (toUnit === 'c/kWh') {
+                return pPerKwh; // 1:1 conversion for display purposes
+            } else if (toUnit === 'p/Wh') {
+                return pPerKwh / 1000;
+            } else if (toUnit === '¢/Wh') {
+                return pPerKwh / 1000;
+            } else if (toUnit === 'c/Wh') {
+                return pPerKwh / 1000;
+            }
+            
+            return pPerKwh;
+        }
+        
 
         // Calculate cost per mile for EV
         function calculateEvCostPerMile() {
             let efficiency = convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh');
-            let costPerKwh = state.evCost / 100; // Convert currency to base unit
+            
+            // Convert EV cost to p/kWh for calculation
+            let costInPPerKwh = convertEvCost(state.evCost, state.evCostUnit, 'p/kWh');
+            let costPerKwh = costInPPerKwh / 100; // Convert to base unit
             
             let costPerMile = costPerKwh / efficiency;
             
@@ -691,9 +693,7 @@
             elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
             elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
             
-            // Update unit labels
-            const currency = getCurrencySymbol();
-            elements.evCostUnitLabel.textContent = `${currency}/kWh`;
+            // Update unit labels - no longer needed as unit is now in selector
             
             // Update fuel cost unit display text
             const volumeUnit = state.fuelCostUnit;
@@ -708,6 +708,7 @@
             
             // Determine distance unit from EV efficiency unit
             const isMetric = state.evEfficiencyUnit.includes('km');
+            const currency = getEvCostCurrencySymbol();
             
             if (isMetric) {
                 elements.equivalenceDisplay.textContent = `Cost per km: ${(costPerKm * 100).toFixed(2)}${currency}`;
@@ -751,7 +752,7 @@
             }
             
             // Energy cost ranges
-            if (state.energyUnit === 'Wh') {
+            if (state.evCostUnit.includes('/Wh')) {
                 elements.evCost.min = 0.01;
                 elements.evCost.max = 15;
                 elements.evCost.step = 0.01;
@@ -849,10 +850,13 @@
         }
         
         function adjustEvCost(petrolCostPerMile) {
-            let targetCost = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
+            let targetCostInP = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
             if (state.includeChargingLosses) {
-                targetCost /= (1 + state.chargingLosses / 100);
+                targetCostInP /= (1 + state.chargingLosses / 100);
             }
+            
+            // Convert from p/kWh to current unit
+            let targetCost = convertEvCost(targetCostInP, 'p/kWh', state.evCostUnit);
             
             state.evCost = Math.max(0.1, targetCost);
             elements.evCost.value = state.evCost;
@@ -1072,8 +1076,16 @@
             updateDisplays();
         });
 
-        elements.currencyUnit.addEventListener('change', (e) => {
-            state.currency = e.target.value;
+        elements.evCostUnit.addEventListener('change', (e) => {
+            const oldUnit = state.evCostUnit;
+            const newUnit = e.target.value;
+            
+            // Convert the current value to the new unit
+            state.evCost = convertEvCost(state.evCost, oldUnit, newUnit);
+            state.evCostUnit = newUnit;
+            
+            updateSliderRanges();
+            elements.evCost.value = state.evCost;
             updateDisplays();
         });
 
