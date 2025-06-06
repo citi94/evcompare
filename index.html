@@ -587,13 +587,13 @@
 
         function formatEvEfficiency(value, unit) {
             if (unit === 'mi/kWh') {
-                return `${value.toFixed(1)} mi/${state.energyUnit}`;
+                return `${value.toFixed(1)} mi/kWh`;
             } else if (unit === 'km/kWh') {
-                return `${value.toFixed(1)} km/${state.energyUnit}`;
+                return `${value.toFixed(1)} km/kWh`;
             } else if (unit === 'kWh/100mi') {
-                return `${value.toFixed(1)} ${state.energyUnit}/100mi`;
+                return `${value.toFixed(1)} kWh/100mi`;
             } else if (unit === 'kWh/100km') {
-                return `${value.toFixed(1)} ${state.energyUnit}/100km`;
+                return `${value.toFixed(1)} kWh/100km`;
             } else if (unit === 'Wh/mi') {
                 return `${value.toFixed(0)} Wh/mi`;
             } else if (unit === 'Wh/km') {
@@ -607,9 +607,9 @@
             } else if (unit === 'mpgUS') {
                 return `${value.toFixed(1)} mpg (US)`;
             } else if (unit === 'km/L') {
-                return `${value.toFixed(1)} km/${state.volumeUnit}`;
+                return `${value.toFixed(1)} km/L`;
             } else if (unit === 'L/100km') {
-                return `${value.toFixed(1)} ${state.volumeUnit}/100km`;
+                return `${value.toFixed(1)} L/100km`;
             }
         }
 
@@ -799,11 +799,6 @@
                     if (adjustableParams.includes('evEfficiency') && changedParameter === 'evCost') {
                         let targetEfficiency = (state.evCost / 100) / petrolCostPerMile;
                         
-                        // Handle Wh vs kWh
-                        if (state.energyUnit === 'Wh') {
-                            targetEfficiency = (state.evCost / 100 * 1000) / petrolCostPerMile;
-                        }
-                        
                         if (state.includeChargingLosses) {
                             targetEfficiency /= (1 + state.chargingLosses / 100);
                         }
@@ -814,11 +809,6 @@
                         let targetCost = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
                         if (state.includeChargingLosses) {
                             targetCost /= (1 + state.chargingLosses / 100);
-                        }
-                        
-                        // Handle Wh vs kWh
-                        if (state.energyUnit === 'Wh') {
-                            targetCost /= 1000;
                         }
                         
                         state.evCost = Math.max(0.1, targetCost);
@@ -832,11 +822,6 @@
                     if (adjustableParams.includes('evEfficiency')) {
                         let targetEfficiency = (state.evCost / 100) / petrolCostPerMile;
                         
-                        // Handle Wh vs kWh
-                        if (state.energyUnit === 'Wh') {
-                            targetEfficiency = (state.evCost / 100 * 1000) / petrolCostPerMile;
-                        }
-                        
                         if (state.includeChargingLosses) {
                             targetEfficiency /= (1 + state.chargingLosses / 100);
                         }
@@ -847,11 +832,6 @@
                         let targetCost = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
                         if (state.includeChargingLosses) {
                             targetCost /= (1 + state.chargingLosses / 100);
-                        }
-                        
-                        // Handle Wh vs kWh
-                        if (state.energyUnit === 'Wh') {
-                            targetCost /= 1000;
                         }
                         
                         state.evCost = Math.max(0.1, targetCost);
