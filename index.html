@@ -474,6 +474,8 @@
                 miPerKwh = 1000 / value;
             } else if (fromUnit === 'Wh/km') {
                 miPerKwh = (1000 * MILES_PER_KM) / value;
+            } else if (fromUnit !== 'mi/kWh') {
+                miPerKwh = value; // Default fallback for unsupported units
             }
             
             // To conversions from mi/kWh
@@ -532,9 +534,9 @@
             } else if (unit === 'kWh/100km') {
                 return `${value.toFixed(1)} ${state.energyUnit}/100km`;
             } else if (unit === 'Wh/mi') {
-                return `${value.toFixed(0)} ${state.energyUnit === 'kWh' ? 'Wh' : 'Wh'}/mi`;
+                return `${value.toFixed(0)} Wh/mi`;
             } else if (unit === 'Wh/km') {
-                return `${value.toFixed(0)} ${state.energyUnit === 'kWh' ? 'Wh' : 'Wh'}/km`;
+                return `${value.toFixed(0)} Wh/km`;
             }
         }
 
@@ -786,20 +788,23 @@
 
         // Prevent more than 2 locks
         function checkLockLimit() {
-            const lockedCount = Object.values(locks).filter(l => l).length;
-            if (lockedCount >= 2) {
-                // Disable unchecked checkboxes
-                if (!locks.evEfficiency) elements.lockEvEfficiency.disabled = true;
-                if (!locks.evCost) elements.lockEvCost.disabled = true;
-                if (!locks.petrolEfficiency) elements.lockPetrolEfficiency.disabled = true;
-                if (!locks.petrolCost) elements.lockPetrolCost.disabled = true;
-            } else {
-                // Enable all checkboxes
-                elements.lockEvEfficiency.disabled = false;
-                elements.lockEvCost.disabled = false;
-                elements.lockPetrolEfficiency.disabled = false;
-                elements.lockPetrolCost.disabled = false;
-            }
+            // Use a timeout to prevent race conditions from simultaneous checkbox changes
+            setTimeout(() => {
+                const lockedCount = Object.values(locks).filter(l => l).length;
+                if (lockedCount >= 2) {
+                    // Disable unchecked checkboxes
+                    if (!locks.evEfficiency) elements.lockEvEfficiency.disabled = true;
+                    if (!locks.evCost) elements.lockEvCost.disabled = true;
+                    if (!locks.petrolEfficiency) elements.lockPetrolEfficiency.disabled = true;
+                    if (!locks.petrolCost) elements.lockPetrolCost.disabled = true;
+                } else {
+                    // Enable all checkboxes
+                    elements.lockEvEfficiency.disabled = false;
+                    elements.lockEvCost.disabled = false;
+                    elements.lockPetrolEfficiency.disabled = false;
+                    elements.lockPetrolCost.disabled = false;
+                }
+            }, 0);
         }
 
         // Charging losses
@@ -862,9 +867,9 @@
             
             // Convert EV cost between Wh and kWh
             if (oldUnit === 'kWh' && state.energyUnit === 'Wh') {
-                state.evCost = state.evCost / 10;
+                state.evCost = state.evCost / 1000;
             } else if (oldUnit === 'Wh' && state.energyUnit === 'kWh') {
-                state.evCost = state.evCost * 10;
+                state.evCost = state.evCost * 1000;
             }
             
             elements.evCost.value = state.evCost;
