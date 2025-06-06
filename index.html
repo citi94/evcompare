@@ -525,7 +525,7 @@
             } else if (toUnit === 'Wh/mi') {
                 return 1000 / miPerKwh;
             } else if (toUnit === 'Wh/km') {
-                return 1000 / (miPerKwh / KM_PER_MILE);
+                return (1000 / miPerKwh) * MILES_PER_KM;
             }
             
             return miPerKwh;
@@ -704,7 +704,7 @@
             elements.fuelCostUnit.value = volumeUnit;
             
             const costPerMile = calculateEvCostPerMile();
-            const costPerKm = costPerMile / MILES_PER_KM;
+            const costPerKm = costPerMile * MILES_PER_KM;
             
             // Determine distance unit from EV efficiency unit
             const isMetric = state.evEfficiencyUnit.includes('km');
