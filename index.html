@@ -749,35 +749,91 @@
             const evCostPerMile = calculateEvCostPerMile();
             const petrolCostPerMile = calculatePetrolCostPerMile();
             
+            // Find which parameters can be adjusted (not locked and not the one that changed)
+            const adjustableParams = [];
+            if (!locks.evEfficiency && changedParameter !== 'evEfficiency') adjustableParams.push('evEfficiency');
+            if (!locks.evCost && changedParameter !== 'evCost') adjustableParams.push('evCost');
+            if (!locks.petrolEfficiency && changedParameter !== 'petrolEfficiency') adjustableParams.push('petrolEfficiency');
+            if (!locks.petrolCost && changedParameter !== 'petrolCost') adjustableParams.push('petrolCost');
+            
+            if (adjustableParams.length === 0) return; // Nothing to adjust
+            
+            // Strategy: Prefer to adjust the "opposite side" first, then fallback to same side
             if (changedParameter === 'evEfficiency' || changedParameter === 'evCost') {
-                // EV side changed - adjust petrol efficiency if not locked
-                if (!locks.petrolEfficiency) {
-                    const volumeUnit = getFuelVolumeUnit();
-                    let costPerLitre = state.petrolCost / 100;
-                    if (volumeUnit === 'galUK') {
-                        costPerLitre = (state.petrolCost / 100) / LITRES_PER_UK_GALLON;
-                    } else if (volumeUnit === 'galUS') {
-                        costPerLitre = (state.petrolCost / 100) / LITRES_PER_US_GALLON;
-                    }
-                    
-                    let targetEfficiency = (costPerLitre * LITRES_PER_UK_GALLON) / evCostPerMile;
-                    targetEfficiency = convertFuelEfficiency(targetEfficiency, 'mpgUK', state.fuelEfficiencyUnit);
-                    state.petrolEfficiency = Math.max(0.1, targetEfficiency);
-                    elements.petrolEfficiency.value = state.petrolEfficiency;
+                // EV side changed - try to adjust petrol side first
+                if (adjustableParams.includes('petrolEfficiency')) {
+                    adjustPetrolEfficiency(evCostPerMile);
+                } else if (adjustableParams.includes('petrolCost')) {
+                    adjustPetrolCost(evCostPerMile);
+                } else if (adjustableParams.includes('evEfficiency')) {
+                    adjustEvEfficiency(petrolCostPerMile);
+                } else if (adjustableParams.includes('evCost')) {
+                    adjustEvCost(petrolCostPerMile);
                 }
             } else {
-                // Petrol side changed - adjust EV efficiency if not locked
-                if (!locks.evEfficiency) {
-                    let targetEfficiency = (state.evCost / 100) / petrolCostPerMile;
-                    
-                    if (state.includeChargingLosses) {
-                        targetEfficiency /= (1 + state.chargingLosses / 100);
-                    }
-                    targetEfficiency = convertEvEfficiency(targetEfficiency, 'mi/kWh', state.evEfficiencyUnit);
-                    state.evEfficiency = Math.max(0.1, targetEfficiency);
-                    elements.evEfficiency.value = state.evEfficiency;
+                // Petrol side changed - try to adjust EV side first
+                if (adjustableParams.includes('evEfficiency')) {
+                    adjustEvEfficiency(petrolCostPerMile);
+                } else if (adjustableParams.includes('evCost')) {
+                    adjustEvCost(petrolCostPerMile);
+                } else if (adjustableParams.includes('petrolEfficiency')) {
+                    adjustPetrolEfficiency(evCostPerMile);
+                } else if (adjustableParams.includes('petrolCost')) {
+                    adjustPetrolCost(evCostPerMile);
                 }
             }
+        }
+        
+        function adjustPetrolEfficiency(evCostPerMile) {
+            const volumeUnit = getFuelVolumeUnit();
+            let costPerLitre = state.petrolCost / 100;
+            if (volumeUnit === 'galUK') {
+                costPerLitre = (state.petrolCost / 100) / LITRES_PER_UK_GALLON;
+            } else if (volumeUnit === 'galUS') {
+                costPerLitre = (state.petrolCost / 100) / LITRES_PER_US_GALLON;
+            }
+            
+            let targetEfficiency = (costPerLitre * LITRES_PER_UK_GALLON) / evCostPerMile;
+            targetEfficiency = convertFuelEfficiency(targetEfficiency, 'mpgUK', state.fuelEfficiencyUnit);
+            state.petrolEfficiency = Math.max(0.1, targetEfficiency);
+            elements.petrolEfficiency.value = state.petrolEfficiency;
+        }
+        
+        function adjustPetrolCost(evCostPerMile) {
+            let mpgUK = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK');
+            let targetCostPerLitre = (evCostPerMile * mpgUK) / LITRES_PER_UK_GALLON;
+            
+            const volumeUnit = getFuelVolumeUnit();
+            let targetCost = targetCostPerLitre * 100; // Convert to currency
+            if (volumeUnit === 'galUK') {
+                targetCost = targetCostPerLitre * LITRES_PER_UK_GALLON * 100;
+            } else if (volumeUnit === 'galUS') {
+                targetCost = targetCostPerLitre * LITRES_PER_US_GALLON * 100;
+            }
+            
+            state.petrolCost = Math.max(0.1, targetCost);
+            elements.petrolCost.value = state.petrolCost;
+        }
+        
+        function adjustEvEfficiency(petrolCostPerMile) {
+            let targetEfficiency = (state.evCost / 100) / petrolCostPerMile;
+            
+            if (state.includeChargingLosses) {
+                targetEfficiency /= (1 + state.chargingLosses / 100);
+            }
+            targetEfficiency = convertEvEfficiency(targetEfficiency, 'mi/kWh', state.evEfficiencyUnit);
+            state.evEfficiency = Math.max(0.1, targetEfficiency);
+            elements.evEfficiency.value = state.evEfficiency;
+        }
+        
+        function adjustEvCost(petrolCostPerMile) {
+            let targetCost = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
+            if (state.includeChargingLosses) {
+                targetCost /= (1 + state.chargingLosses / 100);
+            }
+            
+            state.evCost = Math.max(0.1, targetCost);
+            elements.evCost.value = state.evCost;
         }
 
         // Event listeners
