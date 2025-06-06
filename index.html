@@ -428,7 +428,11 @@
                         <span class="label-text">Fuel Cost</span>
                         <div class="value-container">
                             <input type="number" class="value-display" id="petrol-cost-display" value="133.9" step="0.1" min="0.1">
-                            <span class="unit-label" id="petrol-cost-unit-label">p/L</span>
+                            <select id="fuel-cost-unit" class="unit-select">
+                                <option value="L">per Litre</option>
+                                <option value="galUS">per US Gal</option>
+                                <option value="galUK">per UK Gal</option>
+                            </select>
                         </div>
                     </div>
                     <div class="slider-container">
@@ -483,8 +487,11 @@
             includeChargingLosses: false,
             evEfficiencyUnit: 'mi/kWh',
             fuelEfficiencyUnit: 'mpgUK',
+            fuelCostUnit: 'L',
             currency: 'pence'
         };
+
+        let isUpdating = false; // Prevent circular updates
 
         let locks = {
             evEfficiency: false,
@@ -504,7 +511,6 @@
             petrolEfficiencyDisplay: document.getElementById('petrol-efficiency-display'),
             petrolCostDisplay: document.getElementById('petrol-cost-display'),
             evCostUnitLabel: document.getElementById('ev-cost-unit-label'),
-            petrolCostUnitLabel: document.getElementById('petrol-cost-unit-label'),
             lockEvEfficiency: document.getElementById('lock-ev-efficiency'),
             lockEvCost: document.getElementById('lock-ev-cost'),
             lockPetrolEfficiency: document.getElementById('lock-petrol-efficiency'),
@@ -514,11 +520,17 @@
             equivalenceDisplay: document.getElementById('equivalence-display'),
             evEfficiencyUnit: document.getElementById('ev-efficiency-unit'),
             fuelEfficiencyUnit: document.getElementById('fuel-efficiency-unit'),
+            fuelCostUnit: document.getElementById('fuel-cost-unit'),
             currencyUnit: document.getElementById('currency-unit')
         };
 
         // Unit conversion functions
         function convertEvEfficiency(value, fromUnit, toUnit) {
+            // Input validation
+            if (isNaN(value) || value === null || value === undefined || value <= 0) {
+                return 0.1; // Return safe default
+            }
+            
             if (fromUnit === toUnit) return value;
             
             // First convert to a standard unit (mi/kWh)
@@ -558,6 +570,11 @@
         }
 
         function convertFuelEfficiency(value, fromUnit, toUnit) {
+            // Input validation
+            if (isNaN(value) || value === null || value === undefined || value <= 0) {
+                return 0.1; // Return safe default
+            }
+            
             if (fromUnit === toUnit) return value;
             
             // First convert to mpgUK
@@ -601,6 +618,7 @@
             } else if (unit === 'Wh/km') {
                 return `${value.toFixed(0)} Wh/km`;
             }
+            return `${value.toFixed(1)} ${unit}`; // Fallback for unknown units
         }
 
         function formatFuelEfficiency(value, unit) {
@@ -613,6 +631,7 @@
             } else if (unit === 'L/100km') {
                 return `${value.toFixed(1)} L/100km`;
             }
+            return `${value.toFixed(1)} ${unit}`; // Fallback for unknown units
         }
 
 
@@ -624,20 +643,9 @@
         }
         
         function getFuelVolumeUnit() {
-            if (state.fuelEfficiencyUnit === 'mpgUK') return 'galUK';
-            if (state.fuelEfficiencyUnit === 'mpgUS') return 'galUS';
-            if (state.fuelEfficiencyUnit === 'km/L' || state.fuelEfficiencyUnit === 'L/100km') return 'L';
-            return 'L';
+            return state.fuelCostUnit; // Now directly returns 'L', 'galUK', or 'galUS'
         }
         
-        function formatFuelCostUnit() {
-            const volumeUnit = getFuelVolumeUnit();
-            const currency = getCurrencySymbol();
-            if (volumeUnit === 'L') return `${currency}/L`;
-            if (volumeUnit === 'galUK') return `${currency}/gal (UK)`;
-            if (volumeUnit === 'galUS') return `${currency}/gal (US)`;
-            return `${currency}/L`;
-        }
 
         // Calculate cost per mile for EV
         function calculateEvCostPerMile() {
@@ -675,6 +683,9 @@
 
         // Update displays
         function updateDisplays() {
+            if (isUpdating) return; // Prevent circular updates
+            isUpdating = true;
+            
             elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(1);
             elements.evCostDisplay.value = state.evCost.toFixed(1);
             elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
@@ -683,7 +694,14 @@
             // Update unit labels
             const currency = getCurrencySymbol();
             elements.evCostUnitLabel.textContent = `${currency}/kWh`;
-            elements.petrolCostUnitLabel.textContent = formatFuelCostUnit();
+            
+            // Update fuel cost unit display text
+            const volumeUnit = state.fuelCostUnit;
+            let unitText = '';
+            if (volumeUnit === 'L') unitText = 'per Litre';
+            else if (volumeUnit === 'galUS') unitText = 'per US Gal';
+            else if (volumeUnit === 'galUK') unitText = 'per UK Gal';
+            elements.fuelCostUnit.value = volumeUnit;
             
             const costPerMile = calculateEvCostPerMile();
             const costPerKm = costPerMile / MILES_PER_KM;
@@ -696,6 +714,8 @@
             } else {
                 elements.equivalenceDisplay.textContent = `Cost per mile: ${(costPerMile * 100).toFixed(2)}${currency}`;
             }
+            
+            isUpdating = false; // Reset flag
         }
 
         // Update slider ranges based on units
@@ -840,24 +860,28 @@
 
         // Event listeners
         elements.evEfficiency.addEventListener('input', (e) => {
+            if (isUpdating) return;
             state.evEfficiency = parseFloat(e.target.value);
             maintainEquivalence('evEfficiency');
             updateDisplays();
         });
 
         elements.evCost.addEventListener('input', (e) => {
+            if (isUpdating) return;
             state.evCost = parseFloat(e.target.value);
             maintainEquivalence('evCost');
             updateDisplays();
         });
 
         elements.petrolEfficiency.addEventListener('input', (e) => {
+            if (isUpdating) return;
             state.petrolEfficiency = parseFloat(e.target.value);
             maintainEquivalence('petrolEfficiency');
             updateDisplays();
         });
 
         elements.petrolCost.addEventListener('input', (e) => {
+            if (isUpdating) return;
             state.petrolCost = parseFloat(e.target.value);
             maintainEquivalence('petrolCost');
             updateDisplays();
@@ -1014,29 +1038,36 @@
             state.petrolEfficiency = convertFuelEfficiency(state.petrolEfficiency, oldUnit, newUnit);
             state.fuelEfficiencyUnit = newUnit;
             
-            // Convert petrol cost to match new volume unit
-            const oldVolumeUnit = getFuelVolumeUnit();
-            let costPerLitre = state.petrolCost / 100;
+            updateSliderRanges();
+            elements.petrolEfficiency.value = state.petrolEfficiency;
+            updateDisplays();
+        });
+
+        elements.fuelCostUnit.addEventListener('change', (e) => {
+            const oldUnit = state.fuelCostUnit;
+            const newUnit = e.target.value;
             
-            // Convert current cost to per-litre
-            if (oldVolumeUnit === 'galUK') {
+            // Convert petrol cost between different volume units
+            // Get cost per litre as base unit
+            let costPerLitre = state.petrolCost / 100;
+            if (oldUnit === 'galUK') {
                 costPerLitre = state.petrolCost / 100 / LITRES_PER_UK_GALLON;
-            } else if (oldVolumeUnit === 'galUS') {
+            } else if (oldUnit === 'galUS') {
                 costPerLitre = state.petrolCost / 100 / LITRES_PER_US_GALLON;
             }
             
+            // Update state
+            state.fuelCostUnit = newUnit;
+            
             // Convert to new volume unit
-            const newVolumeUnit = getFuelVolumeUnit();
-            if (newVolumeUnit === 'L') {
+            if (newUnit === 'L') {
                 state.petrolCost = costPerLitre * 100;
-            } else if (newVolumeUnit === 'galUK') {
+            } else if (newUnit === 'galUK') {
                 state.petrolCost = costPerLitre * LITRES_PER_UK_GALLON * 100;
-            } else if (newVolumeUnit === 'galUS') {
+            } else if (newUnit === 'galUS') {
                 state.petrolCost = costPerLitre * LITRES_PER_US_GALLON * 100;
             }
             
-            updateSliderRanges();
-            elements.petrolEfficiency.value = state.petrolEfficiency;
             elements.petrolCost.value = state.petrolCost;
             updateDisplays();
         });
