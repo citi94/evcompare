@@ -293,6 +293,42 @@
         }
 
         .unit-select {
+            padding: 2px 5px;
+            border: 1px solid #dfe6e9;
+            border-radius: 3px;
+            font-size: 0.8em;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            margin-left: 5px;
+        }
+
+        .unit-select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .currency-selector {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .currency-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .currency-label {
+            font-weight: 500;
+            color: #34495e;
+        }
+
+        .currency-select {
             padding: 5px 10px;
             border: 2px solid #dfe6e9;
             border-radius: 5px;
@@ -302,26 +338,15 @@
             transition: border-color 0.3s ease;
         }
 
-        .unit-select:focus {
+        .currency-select:focus {
             border-color: #3498db;
             outline: none;
         }
 
-        .unit-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .unit-group:last-child {
-            margin-bottom: 0;
-        }
-
         .unit-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
             font-weight: 500;
-            color: #34495e;
-            min-width: 120px;
         }
     </style>
 </head>
@@ -342,7 +367,14 @@
                         <span class="label-text">Efficiency</span>
                         <div class="value-container">
                             <input type="number" class="value-display" id="ev-efficiency-display" value="4.0" step="0.1" min="0.1">
-                            <span class="unit-label" id="ev-efficiency-unit-label">mi/kWh</span>
+                            <select id="ev-efficiency-unit" class="unit-select">
+                                <option value="mi/kWh">mi/kWh</option>
+                                <option value="km/kWh">km/kWh</option>
+                                <option value="kWh/100mi">kWh/100mi</option>
+                                <option value="kWh/100km">kWh/100km</option>
+                                <option value="Wh/mi">Wh/mi</option>
+                                <option value="Wh/km">Wh/km</option>
+                            </select>
                         </div>
                     </div>
                     <div class="slider-container">
@@ -377,7 +409,12 @@
                         <span class="label-text">Efficiency</span>
                         <div class="value-container">
                             <input type="number" class="value-display" id="petrol-efficiency-display" value="44.0" step="0.1" min="0.1">
-                            <span class="unit-label" id="petrol-efficiency-unit-label">mpg</span>
+                            <select id="fuel-efficiency-unit" class="unit-select">
+                                <option value="mpgUK">mpg (UK)</option>
+                                <option value="mpgUS">mpg (US)</option>
+                                <option value="km/L">km/L</option>
+                                <option value="L/100km">L/100km</option>
+                            </select>
                         </div>
                     </div>
                     <div class="slider-container">
@@ -413,48 +450,13 @@
             </div>
         </div>
 
-        <div class="unit-selector">
-            <h3 style="margin-bottom: 15px; color: #34495e;">Unit Preferences</h3>
-            <div class="unit-group">
-                <span class="unit-label">Distance:</span>
-                <select id="distance-unit" class="unit-select">
-                    <option value="miles">Miles</option>
-                    <option value="km">Kilometers</option>
-                </select>
-            </div>
-            <div class="unit-group">
-                <span class="unit-label">Energy:</span>
-                <select id="energy-unit" class="unit-select">
-                    <option value="kWh">Kilowatt-hours (kWh)</option>
-                    <option value="Wh">Watt-hours (Wh)</option>
-                </select>
-            </div>
-            <div class="unit-group">
-                <span class="unit-label">Volume:</span>
-                <select id="volume-unit" class="unit-select">
-                    <option value="L">Litres</option>
-                    <option value="galUK">UK Gallons</option>
-                    <option value="galUS">US Gallons</option>
-                </select>
-            </div>
-            <div class="unit-group">
-                <span class="unit-label">EV Efficiency:</span>
-                <select id="ev-efficiency-unit" class="unit-select">
-                    <option value="mi/kWh">miles/kWh</option>
-                    <option value="km/kWh">km/kWh</option>
-                    <option value="kWh/100mi">kWh/100mi</option>
-                    <option value="kWh/100km">kWh/100km</option>
-                    <option value="Wh/mi">Wh/mile</option>
-                    <option value="Wh/km">Wh/km</option>
-                </select>
-            </div>
-            <div class="unit-group">
-                <span class="unit-label">Fuel Efficiency:</span>
-                <select id="fuel-efficiency-unit" class="unit-select">
-                    <option value="mpgUK">mpg (UK)</option>
-                    <option value="mpgUS">mpg (US)</option>
-                    <option value="km/L">km/L</option>
-                    <option value="L/100km">L/100km</option>
+        <div class="currency-selector">
+            <div class="currency-group">
+                <span class="currency-label">Currency:</span>
+                <select id="currency-unit" class="currency-select">
+                    <option value="pence">Pence (p)</option>
+                    <option value="cents">Cents (¢)</option>
+                    <option value="eurocents">Euro cents (c)</option>
                 </select>
             </div>
         </div>
@@ -479,11 +481,9 @@
             petrolCost: 133.9,
             chargingLosses: 10,
             includeChargingLosses: false,
-            distanceUnit: 'miles',
-            energyUnit: 'kWh',
-            volumeUnit: 'L',
             evEfficiencyUnit: 'mi/kWh',
-            fuelEfficiencyUnit: 'mpgUK'
+            fuelEfficiencyUnit: 'mpgUK',
+            currency: 'pence'
         };
 
         let locks = {
@@ -503,9 +503,7 @@
             evCostDisplay: document.getElementById('ev-cost-display'),
             petrolEfficiencyDisplay: document.getElementById('petrol-efficiency-display'),
             petrolCostDisplay: document.getElementById('petrol-cost-display'),
-            evEfficiencyUnitLabel: document.getElementById('ev-efficiency-unit-label'),
             evCostUnitLabel: document.getElementById('ev-cost-unit-label'),
-            petrolEfficiencyUnitLabel: document.getElementById('petrol-efficiency-unit-label'),
             petrolCostUnitLabel: document.getElementById('petrol-cost-unit-label'),
             lockEvEfficiency: document.getElementById('lock-ev-efficiency'),
             lockEvCost: document.getElementById('lock-ev-cost'),
@@ -514,11 +512,9 @@
             chargingLossesCheckbox: document.getElementById('charging-losses-checkbox'),
             chargingLossesInput: document.getElementById('charging-losses-input'),
             equivalenceDisplay: document.getElementById('equivalence-display'),
-            distanceUnit: document.getElementById('distance-unit'),
-            energyUnit: document.getElementById('energy-unit'),
-            volumeUnit: document.getElementById('volume-unit'),
             evEfficiencyUnit: document.getElementById('ev-efficiency-unit'),
-            fuelEfficiencyUnit: document.getElementById('fuel-efficiency-unit')
+            fuelEfficiencyUnit: document.getElementById('fuel-efficiency-unit'),
+            currencyUnit: document.getElementById('currency-unit')
         };
 
         // Unit conversion functions
@@ -617,43 +613,34 @@
             }
         }
 
-        function formatVolume(unit) {
-            if (unit === 'L') return 'p/L';
-            if (unit === 'galUK') return 'p/gal (UK)';
-            if (unit === 'galUS') return 'p/gal (US)';
-        }
 
-        function formatEnergy(unit) {
-            return `p/${unit}`;
+        function getCurrencySymbol() {
+            if (state.currency === 'pence') return 'p';
+            if (state.currency === 'cents') return '¢';
+            if (state.currency === 'eurocents') return 'c';
+            return 'p';
         }
         
-        function getEvEfficiencyUnitDisplay(unit) {
-            if (unit === 'mi/kWh') return `mi/${state.energyUnit}`;
-            if (unit === 'km/kWh') return `km/${state.energyUnit}`;
-            if (unit === 'kWh/100mi') return `${state.energyUnit}/100mi`;
-            if (unit === 'kWh/100km') return `${state.energyUnit}/100km`;
-            if (unit === 'Wh/mi') return 'Wh/mi';
-            if (unit === 'Wh/km') return 'Wh/km';
-            return unit;
+        function getFuelVolumeUnit() {
+            if (state.fuelEfficiencyUnit === 'mpgUK') return 'galUK';
+            if (state.fuelEfficiencyUnit === 'mpgUS') return 'galUS';
+            if (state.fuelEfficiencyUnit === 'km/L' || state.fuelEfficiencyUnit === 'L/100km') return 'L';
+            return 'L';
         }
         
-        function getFuelEfficiencyUnitDisplay(unit) {
-            if (unit === 'mpgUK') return 'mpg (UK)';
-            if (unit === 'mpgUS') return 'mpg (US)';
-            if (unit === 'km/L') return `km/${state.volumeUnit}`;
-            if (unit === 'L/100km') return `${state.volumeUnit}/100km`;
-            return unit;
+        function formatFuelCostUnit() {
+            const volumeUnit = getFuelVolumeUnit();
+            const currency = getCurrencySymbol();
+            if (volumeUnit === 'L') return `${currency}/L`;
+            if (volumeUnit === 'galUK') return `${currency}/gal (UK)`;
+            if (volumeUnit === 'galUS') return `${currency}/gal (US)`;
+            return `${currency}/L`;
         }
 
         // Calculate cost per mile for EV
         function calculateEvCostPerMile() {
             let efficiency = convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh');
-            let costPerKwh = state.evCost / 100; // Convert pence to pounds
-            
-            // Handle Wh vs kWh
-            if (state.energyUnit === 'Wh') {
-                costPerKwh = state.evCost / 100 * 1000; // Cost per Wh to cost per kWh
-            }
+            let costPerKwh = state.evCost / 100; // Convert currency to base unit
             
             let costPerMile = costPerKwh / efficiency;
             
@@ -667,13 +654,17 @@
         // Calculate cost per mile for petrol
         function calculatePetrolCostPerMile() {
             let efficiency = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK');
-            let costPerLitre = state.petrolCost / 100; // Convert pence to pounds
+            let costPerUnit = state.petrolCost / 100; // Convert currency to base unit
             
             // Convert cost to per litre if needed
-            if (state.volumeUnit === 'galUK') {
-                costPerLitre = (state.petrolCost / 100) / LITRES_PER_UK_GALLON;
-            } else if (state.volumeUnit === 'galUS') {
-                costPerLitre = (state.petrolCost / 100) / LITRES_PER_US_GALLON;
+            const volumeUnit = getFuelVolumeUnit();
+            let costPerLitre;
+            if (volumeUnit === 'galUK') {
+                costPerLitre = costPerUnit / LITRES_PER_UK_GALLON;
+            } else if (volumeUnit === 'galUS') {
+                costPerLitre = costPerUnit / LITRES_PER_US_GALLON;
+            } else {
+                costPerLitre = costPerUnit; // Already per litre
             }
             
             let costPerGallon = costPerLitre * LITRES_PER_UK_GALLON;
@@ -688,18 +679,21 @@
             elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
             
             // Update unit labels
-            elements.evEfficiencyUnitLabel.textContent = getEvEfficiencyUnitDisplay(state.evEfficiencyUnit);
-            elements.evCostUnitLabel.textContent = formatEnergy(state.energyUnit);
-            elements.petrolEfficiencyUnitLabel.textContent = getFuelEfficiencyUnitDisplay(state.fuelEfficiencyUnit);
-            elements.petrolCostUnitLabel.textContent = formatVolume(state.volumeUnit);
+            const currency = getCurrencySymbol();
+            elements.evCostUnitLabel.textContent = `${currency}/kWh`;
+            elements.petrolCostUnitLabel.textContent = formatFuelCostUnit();
             
             const costPerMile = calculateEvCostPerMile();
             const costPerKm = costPerMile / MILES_PER_KM;
+            const currency = getCurrencySymbol();
             
-            if (state.distanceUnit === 'miles') {
-                elements.equivalenceDisplay.textContent = `Cost per mile: ${(costPerMile * 100).toFixed(2)}p`;
+            // Determine distance unit from EV efficiency unit
+            const isMetric = state.evEfficiencyUnit.includes('km');
+            
+            if (isMetric) {
+                elements.equivalenceDisplay.textContent = `Cost per km: ${(costPerKm * 100).toFixed(2)}${currency}`;
             } else {
-                elements.equivalenceDisplay.textContent = `Cost per km: ${(costPerKm * 100).toFixed(2)}p`;
+                elements.equivalenceDisplay.textContent = `Cost per mile: ${(costPerMile * 100).toFixed(2)}${currency}`;
             }
         }
 
@@ -1020,86 +1014,6 @@
         });
 
         // Unit selectors
-        elements.distanceUnit.addEventListener('change', (e) => {
-            const oldUnit = state.distanceUnit;
-            state.distanceUnit = e.target.value;
-            
-            // Update efficiency unit dropdowns based on distance preference
-            if (state.distanceUnit === 'miles') {
-                // Switch to mile-based units
-                if (state.evEfficiencyUnit.includes('km')) {
-                    if (state.evEfficiencyUnit === 'km/kWh') state.evEfficiencyUnit = 'mi/kWh';
-                    else if (state.evEfficiencyUnit === 'kWh/100km') state.evEfficiencyUnit = 'kWh/100mi';
-                    else if (state.evEfficiencyUnit === 'Wh/km') state.evEfficiencyUnit = 'Wh/mi';
-                }
-                
-                // Update fuel efficiency unit options
-                elements.evEfficiencyUnit.innerHTML = `
-                    <option value="mi/kWh">miles/kWh</option>
-                    <option value="kWh/100mi">kWh/100mi</option>
-                    <option value="Wh/mi">Wh/mile</option>
-                `;
-            } else {
-                // Switch to km-based units
-                if (state.evEfficiencyUnit.includes('mi')) {
-                    if (state.evEfficiencyUnit === 'mi/kWh') state.evEfficiencyUnit = 'km/kWh';
-                    else if (state.evEfficiencyUnit === 'kWh/100mi') state.evEfficiencyUnit = 'kWh/100km';
-                    else if (state.evEfficiencyUnit === 'Wh/mi') state.evEfficiencyUnit = 'Wh/km';
-                }
-                
-                elements.evEfficiencyUnit.innerHTML = `
-                    <option value="km/kWh">km/kWh</option>
-                    <option value="kWh/100km">kWh/100km</option>
-                    <option value="Wh/km">Wh/km</option>
-                `;
-            }
-            
-            elements.evEfficiencyUnit.value = state.evEfficiencyUnit;
-            updateSliderRanges();
-            updateDisplays();
-        });
-
-        elements.energyUnit.addEventListener('change', (e) => {
-            const oldUnit = state.energyUnit;
-            state.energyUnit = e.target.value;
-            
-            // Convert EV cost between Wh and kWh
-            if (oldUnit === 'kWh' && state.energyUnit === 'Wh') {
-                state.evCost = state.evCost / 1000;
-            } else if (oldUnit === 'Wh' && state.energyUnit === 'kWh') {
-                state.evCost = state.evCost * 1000;
-            }
-            
-            elements.evCost.value = state.evCost;
-            updateSliderRanges();
-            updateDisplays();
-        });
-
-        elements.volumeUnit.addEventListener('change', (e) => {
-            const oldUnit = state.volumeUnit;
-            state.volumeUnit = e.target.value;
-            
-            // Convert petrol cost between units
-            let oldCostPerLitre = state.petrolCost / 100;
-            if (oldUnit === 'galUK') {
-                oldCostPerLitre = state.petrolCost / 100 / LITRES_PER_UK_GALLON;
-            } else if (oldUnit === 'galUS') {
-                oldCostPerLitre = state.petrolCost / 100 / LITRES_PER_US_GALLON;
-            }
-            
-            // Convert to new unit
-            if (state.volumeUnit === 'L') {
-                state.petrolCost = oldCostPerLitre * 100;
-            } else if (state.volumeUnit === 'galUK') {
-                state.petrolCost = oldCostPerLitre * LITRES_PER_UK_GALLON * 100;
-            } else if (state.volumeUnit === 'galUS') {
-                state.petrolCost = oldCostPerLitre * LITRES_PER_US_GALLON * 100;
-            }
-            
-            elements.petrolCost.value = state.petrolCost;
-            updateDisplays();
-        });
-
         elements.evEfficiencyUnit.addEventListener('change', (e) => {
             const oldUnit = state.evEfficiencyUnit;
             const newUnit = e.target.value;
@@ -1107,6 +1021,38 @@
             // Convert the current value to the new unit
             state.evEfficiency = convertEvEfficiency(state.evEfficiency, oldUnit, newUnit);
             state.evEfficiencyUnit = newUnit;
+            
+            // Auto-update fuel efficiency to match distance base
+            const isMetric = newUnit.includes('km');
+            const currentFuelIsMetric = state.fuelEfficiencyUnit.includes('km') || state.fuelEfficiencyUnit.includes('L');
+            
+            if (isMetric && !currentFuelIsMetric) {
+                // Switch to metric fuel units
+                const oldFuelEfficiency = state.petrolEfficiency;
+                if (state.fuelEfficiencyUnit === 'mpgUK') {
+                    state.petrolEfficiency = convertFuelEfficiency(oldFuelEfficiency, 'mpgUK', 'L/100km');
+                    state.fuelEfficiencyUnit = 'L/100km';
+                } else if (state.fuelEfficiencyUnit === 'mpgUS') {
+                    state.petrolEfficiency = convertFuelEfficiency(oldFuelEfficiency, 'mpgUS', 'L/100km');
+                    state.fuelEfficiencyUnit = 'L/100km';
+                }
+                elements.fuelEfficiencyUnit.value = state.fuelEfficiencyUnit;
+                elements.petrolEfficiency.value = state.petrolEfficiency;
+                elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
+            } else if (!isMetric && currentFuelIsMetric) {
+                // Switch to imperial fuel units
+                const oldFuelEfficiency = state.petrolEfficiency;
+                if (state.fuelEfficiencyUnit === 'L/100km') {
+                    state.petrolEfficiency = convertFuelEfficiency(oldFuelEfficiency, 'L/100km', 'mpgUK');
+                    state.fuelEfficiencyUnit = 'mpgUK';
+                } else if (state.fuelEfficiencyUnit === 'km/L') {
+                    state.petrolEfficiency = convertFuelEfficiency(oldFuelEfficiency, 'km/L', 'mpgUK');
+                    state.fuelEfficiencyUnit = 'mpgUK';
+                }
+                elements.fuelEfficiencyUnit.value = state.fuelEfficiencyUnit;
+                elements.petrolEfficiency.value = state.petrolEfficiency;
+                elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
+            }
             
             updateSliderRanges();
             elements.evEfficiency.value = state.evEfficiency;
@@ -1121,8 +1067,35 @@
             state.petrolEfficiency = convertFuelEfficiency(state.petrolEfficiency, oldUnit, newUnit);
             state.fuelEfficiencyUnit = newUnit;
             
+            // Convert petrol cost to match new volume unit
+            const oldVolumeUnit = getFuelVolumeUnit();
+            let costPerLitre = state.petrolCost / 100;
+            
+            // Convert current cost to per-litre
+            if (oldVolumeUnit === 'galUK') {
+                costPerLitre = state.petrolCost / 100 / LITRES_PER_UK_GALLON;
+            } else if (oldVolumeUnit === 'galUS') {
+                costPerLitre = state.petrolCost / 100 / LITRES_PER_US_GALLON;
+            }
+            
+            // Convert to new volume unit
+            const newVolumeUnit = getFuelVolumeUnit();
+            if (newVolumeUnit === 'L') {
+                state.petrolCost = costPerLitre * 100;
+            } else if (newVolumeUnit === 'galUK') {
+                state.petrolCost = costPerLitre * LITRES_PER_UK_GALLON * 100;
+            } else if (newVolumeUnit === 'galUS') {
+                state.petrolCost = costPerLitre * LITRES_PER_US_GALLON * 100;
+            }
+            
             updateSliderRanges();
             elements.petrolEfficiency.value = state.petrolEfficiency;
+            elements.petrolCost.value = state.petrolCost;
+            updateDisplays();
+        });
+
+        elements.currencyUnit.addEventListener('change', (e) => {
+            state.currency = e.target.value;
             updateDisplays();
         });
 
