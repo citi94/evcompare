@@ -95,6 +95,18 @@
             margin-bottom: 8px;
         }
 
+        .value-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .unit-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
         .label-text {
             font-weight: 500;
             color: #34495e;
@@ -328,7 +340,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Efficiency</span>
-                        <input type="number" class="value-display" id="ev-efficiency-display" value="4.0" step="0.1" min="0.1">
+                        <div class="value-container">
+                            <input type="number" class="value-display" id="ev-efficiency-display" value="4.0" step="0.1" min="0.1">
+                            <span class="unit-label" id="ev-efficiency-unit-label">mi/kWh</span>
+                        </div>
                     </div>
                     <div class="slider-container">
                         <input type="range" id="ev-efficiency" min="1" max="10" step="0.1" value="4">
@@ -339,7 +354,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Electricity Cost</span>
-                        <input type="number" class="value-display" id="ev-cost-display" value="55.0" step="0.1" min="0.1">
+                        <div class="value-container">
+                            <input type="number" class="value-display" id="ev-cost-display" value="55.0" step="0.1" min="0.1">
+                            <span class="unit-label" id="ev-cost-unit-label">p/kWh</span>
+                        </div>
                     </div>
                     <div class="slider-container">
                         <input type="range" id="ev-cost" min="0.1" max="150" step="0.1" value="55">
@@ -357,7 +375,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Efficiency</span>
-                        <input type="number" class="value-display" id="petrol-efficiency-display" value="44.0" step="0.1" min="0.1">
+                        <div class="value-container">
+                            <input type="number" class="value-display" id="petrol-efficiency-display" value="44.0" step="0.1" min="0.1">
+                            <span class="unit-label" id="petrol-efficiency-unit-label">mpg</span>
+                        </div>
                     </div>
                     <div class="slider-container">
                         <input type="range" id="petrol-efficiency" min="1" max="200" step="0.1" value="44">
@@ -368,7 +389,10 @@
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Fuel Cost</span>
-                        <input type="number" class="value-display" id="petrol-cost-display" value="133.9" step="0.1" min="0.1">
+                        <div class="value-container">
+                            <input type="number" class="value-display" id="petrol-cost-display" value="133.9" step="0.1" min="0.1">
+                            <span class="unit-label" id="petrol-cost-unit-label">p/L</span>
+                        </div>
                     </div>
                     <div class="slider-container">
                         <input type="range" id="petrol-cost" min="10" max="200" step="0.1" value="133.9">
@@ -479,6 +503,10 @@
             evCostDisplay: document.getElementById('ev-cost-display'),
             petrolEfficiencyDisplay: document.getElementById('petrol-efficiency-display'),
             petrolCostDisplay: document.getElementById('petrol-cost-display'),
+            evEfficiencyUnitLabel: document.getElementById('ev-efficiency-unit-label'),
+            evCostUnitLabel: document.getElementById('ev-cost-unit-label'),
+            petrolEfficiencyUnitLabel: document.getElementById('petrol-efficiency-unit-label'),
+            petrolCostUnitLabel: document.getElementById('petrol-cost-unit-label'),
             lockEvEfficiency: document.getElementById('lock-ev-efficiency'),
             lockEvCost: document.getElementById('lock-ev-cost'),
             lockPetrolEfficiency: document.getElementById('lock-petrol-efficiency'),
@@ -598,6 +626,24 @@
         function formatEnergy(unit) {
             return `p/${unit}`;
         }
+        
+        function getEvEfficiencyUnitDisplay(unit) {
+            if (unit === 'mi/kWh') return `mi/${state.energyUnit}`;
+            if (unit === 'km/kWh') return `km/${state.energyUnit}`;
+            if (unit === 'kWh/100mi') return `${state.energyUnit}/100mi`;
+            if (unit === 'kWh/100km') return `${state.energyUnit}/100km`;
+            if (unit === 'Wh/mi') return 'Wh/mi';
+            if (unit === 'Wh/km') return 'Wh/km';
+            return unit;
+        }
+        
+        function getFuelEfficiencyUnitDisplay(unit) {
+            if (unit === 'mpgUK') return 'mpg (UK)';
+            if (unit === 'mpgUS') return 'mpg (US)';
+            if (unit === 'km/L') return `km/${state.volumeUnit}`;
+            if (unit === 'L/100km') return `${state.volumeUnit}/100km`;
+            return unit;
+        }
 
         // Calculate cost per mile for EV
         function calculateEvCostPerMile() {
@@ -640,6 +686,12 @@
             elements.evCostDisplay.value = state.evCost.toFixed(1);
             elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
             elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
+            
+            // Update unit labels
+            elements.evEfficiencyUnitLabel.textContent = getEvEfficiencyUnitDisplay(state.evEfficiencyUnit);
+            elements.evCostUnitLabel.textContent = formatEnergy(state.energyUnit);
+            elements.petrolEfficiencyUnitLabel.textContent = getFuelEfficiencyUnitDisplay(state.fuelEfficiencyUnit);
+            elements.petrolCostUnitLabel.textContent = formatVolume(state.volumeUnit);
             
             const costPerMile = calculateEvCostPerMile();
             const costPerKm = costPerMile / MILES_PER_KM;
