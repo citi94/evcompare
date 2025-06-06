@@ -4,33 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EV vs Petrol Fuel Cost Comparison</title>
+    <title>EV vs Petrol Cost Calculator</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --warning: #f59e0b;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
 ```
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
     body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-color: var(--background);
-        color: var(--text);
-        line-height: 1.6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -39,193 +24,219 @@
     }
 
     .container {
-        background: var(--surface);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
         border-radius: 20px;
-        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         padding: 40px;
         max-width: 800px;
         width: 100%;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
+        text-align: center;
+        color: #2d3748;
         margin-bottom: 10px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 300;
     }
 
     .subtitle {
-        color: var(--text-muted);
+        text-align: center;
+        color: #718096;
+        margin-bottom: 40px;
         font-size: 1.1rem;
+    }
+
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
         margin-bottom: 40px;
     }
 
-    .comparison-box {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 30px;
-        text-align: center;
-        font-size: 1.2rem;
-        color: var(--primary-dark);
-        font-weight: 600;
-        min-height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .vehicle-section {
+        background: #f7fafc;
+        border-radius: 15px;
+        padding: 30px;
+        border: 2px solid transparent;
         transition: all 0.3s ease;
     }
 
-    .section {
-        margin-bottom: 30px;
+    .vehicle-section:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
     }
 
-    .section-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: var(--text);
+    .vehicle-section h2 {
+        color: #2d3748;
+        margin-bottom: 25px;
+        font-size: 1.5rem;
         display: flex;
         align-items: center;
         gap: 10px;
     }
 
-    .slider-group {
+    .icon {
+        font-size: 1.8rem;
+    }
+
+    .control-group {
         margin-bottom: 25px;
     }
 
-    .slider-label {
+    .control-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
-    .label-text {
-        font-weight: 500;
-        color: var(--text);
+    label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.95rem;
+    }
+
+    .value-display {
+        font-weight: bold;
+        color: #2d3748;
+        font-size: 1.1rem;
+        min-width: 80px;
+        text-align: right;
+    }
+
+    .slider-container {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        height: 8px;
+        border-radius: 5px;
+        background: #e2e8f0;
+        outline: none;
+        appearance: none;
+        transition: all 0.3s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #667eea;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #667eea;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+    }
+
+    .lock-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #667eea;
+    }
+
+    .lock-label {
+        font-size: 0.85rem;
+        color: #718096;
+    }
+
+    .charging-losses {
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .charging-losses h3 {
+        color: #c53030;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
-    .value-display {
-        font-size: 1.1rem;
+    .equivalence-display {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        font-size: 1.2rem;
         font-weight: 600;
-        color: var(--primary);
-        min-width: 100px;
-        text-align: right;
-    }
-
-    .slider {
-        width: 100%;
-        height: 6px;
-        border-radius: 3px;
-        background: var(--border);
-        outline: none;
-        -webkit-appearance: none;
-        transition: background 0.3s;
-    }
-
-    .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--primary);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .slider::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--primary);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .slider:hover::-webkit-slider-thumb {
-        transform: scale(1.2);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    .slider:hover::-moz-range-thumb {
-        transform: scale(1.2);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    .checkbox-group {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 15px;
-    }
-
-    .checkbox {
-        width: 20px;
-        height: 20px;
-        accent-color: var(--primary);
-        cursor: pointer;
-    }
-
-    .checkbox-label {
-        font-weight: 500;
-        cursor: pointer;
-        user-select: none;
-    }
-
-    .lock-checkbox {
-        width: 16px;
-        height: 16px;
-        accent-color: var(--warning);
-    }
-
-    .options {
-        background: var(--background);
-        border-radius: 12px;
-        padding: 20px;
+        box-shadow: 0 8px 20px rgba(72, 187, 120, 0.3);
         margin-top: 30px;
     }
 
-    .icon {
-        width: 24px;
-        height: 24px;
-        display: inline-block;
-        vertical-align: middle;
+    .unit-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
     }
 
-    @media (max-width: 640px) {
+    .unit-toggle:hover {
+        background: white;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
         .container {
-            padding: 30px 20px;
+            padding: 20px;
+            margin: 10px;
+        }
+        
+        .comparison-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
         
         h1 {
             font-size: 2rem;
         }
         
-        .value-display {
-            min-width: 80px;
-            font-size: 1rem;
+        .vehicle-section {
+            padding: 20px;
         }
-    }
-
-    .locked {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-
-    .lock-indicator {
-        color: var(--warning);
-        font-size: 0.9rem;
-        margin-left: 5px;
     }
 </style>
 ```
@@ -233,320 +244,349 @@
 </head>
 <body>
     <div class="container">
-        <h1>EV vs Petrol Calculator</h1>
-        <p class="subtitle">Compare the fuel costs of electric and petrol vehicles</p>
+        <button class="unit-toggle" onclick="toggleUnits()">🌍 Switch Units</button>
 
 ```
-    <div class="comparison-box" id="comparison">
-        Calculating...
-    </div>
-
-    <div class="section">
-        <h2 class="section-title">
-            <span class="icon">⚡</span>
-            Electric Vehicle
-        </h2>
-        
-        <div class="slider-group">
-            <div class="slider-label">
-                <span class="label-text">
-                    Efficiency
-                    <input type="checkbox" class="lock-checkbox" id="lock-ev-efficiency" title="Lock this value">
-                </span>
-                <span class="value-display" id="ev-efficiency-value">4.0 mi/kWh</span>
+    <h1>EV vs Petrol Calculator</h1>
+    <p class="subtitle">Compare the running costs of electric and petrol vehicles</p>
+    
+    <div class="charging-losses">
+        <h3>⚡ Charging Losses</h3>
+        <div class="control-group">
+            <div class="control-header">
+                <label>
+                    <input type="checkbox" id="includeLosses" onchange="toggleLosses()">
+                    Include charging losses
+                </label>
+                <span class="value-display" id="lossesValue">10.0%</span>
             </div>
-            <input type="range" id="ev-efficiency" class="slider" min="1" max="10" step="0.1" value="4">
-        </div>
-
-        <div class="slider-group">
-            <div class="slider-label">
-                <span class="label-text">
-                    Electricity Cost
-                    <input type="checkbox" class="lock-checkbox" id="lock-electricity-cost" title="Lock this value">
-                </span>
-                <span class="value-display" id="electricity-cost-value">55.0p/kWh</span>
+            <div class="slider-container">
+                <input type="range" id="lossesSlider" min="0" max="30" step="0.1" value="10" 
+                       oninput="updateLosses()" disabled>
             </div>
-            <input type="range" id="electricity-cost" class="slider" min="0.1" max="150" step="0.1" value="55">
         </div>
     </div>
 
-    <div class="section">
-        <h2 class="section-title">
-            <span class="icon">⛽</span>
-            Petrol Vehicle
-        </h2>
-        
-        <div class="slider-group">
-            <div class="slider-label">
-                <span class="label-text">
-                    Fuel Economy
-                    <input type="checkbox" class="lock-checkbox" id="lock-petrol-mpg" title="Lock this value">
-                </span>
-                <span class="value-display" id="petrol-mpg-value">44.0 mpg</span>
+    <div class="comparison-grid">
+        <div class="vehicle-section">
+            <h2><span class="icon">🔋</span>Electric Vehicle</h2>
+            
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Efficiency</label>
+                    <span class="value-display" id="efficiencyValue">4.0 mi/kWh</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="efficiencySlider" min="1" max="10" step="0.1" value="4" 
+                           oninput="updateCalculations('efficiency')">
+                </div>
+                <div class="lock-control">
+                    <input type="checkbox" id="lockEfficiency" onchange="updateLocks()">
+                    <label class="lock-label">Lock this value</label>
+                </div>
             </div>
-            <input type="range" id="petrol-mpg" class="slider" min="1" max="200" step="0.1" value="44">
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Electricity Cost</label>
+                    <span class="value-display" id="electricityCostValue">55.0 p/kWh</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="electricityCostSlider" min="0.1" max="150" step="0.1" value="55" 
+                           oninput="updateCalculations('electricityCost')">
+                </div>
+                <div class="lock-control">
+                    <input type="checkbox" id="lockElectricityCost" onchange="updateLocks()">
+                    <label class="lock-label">Lock this value</label>
+                </div>
+            </div>
         </div>
 
-        <div class="slider-group">
-            <div class="slider-label">
-                <span class="label-text">
-                    Petrol Price
-                    <input type="checkbox" class="lock-checkbox" id="lock-petrol-price" title="Lock this value">
-                </span>
-                <span class="value-display" id="petrol-price-value">133.9p/L</span>
+        <div class="vehicle-section">
+            <h2><span class="icon">⛽</span>Petrol Vehicle</h2>
+            
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Fuel Economy</label>
+                    <span class="value-display" id="mpgValue">44.0 mpg</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="mpgSlider" min="1" max="200" step="0.1" value="44" 
+                           oninput="updateCalculations('mpg')">
+                </div>
+                <div class="lock-control">
+                    <input type="checkbox" id="lockMpg" onchange="updateLocks()">
+                    <label class="lock-label">Lock this value</label>
+                </div>
             </div>
-            <input type="range" id="petrol-price" class="slider" min="10" max="200" step="0.1" value="133.9">
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Petrol Cost</label>
+                    <span class="value-display" id="petrolCostValue">133.9 p/L</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="petrolCostSlider" min="10" max="200" step="0.1" value="133.9" 
+                           oninput="updateCalculations('petrolCost')">
+                </div>
+                <div class="lock-control">
+                    <input type="checkbox" id="lockPetrolCost" onchange="updateLocks()">
+                    <label class="lock-label">Lock this value</label>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="options">
-        <div class="checkbox-group">
-            <input type="checkbox" id="charging-losses" class="checkbox">
-            <label for="charging-losses" class="checkbox-label">Include charging losses</label>
-        </div>
-        
-        <div class="slider-group" id="charging-losses-group" style="display: none;">
-            <div class="slider-label">
-                <span class="label-text">Charging efficiency</span>
-                <span class="value-display" id="charging-efficiency-value">90%</span>
-            </div>
-            <input type="range" id="charging-efficiency" class="slider" min="50" max="100" step="1" value="90">
-        </div>
+    <div class="equivalence-display" id="equivalenceDisplay">
+        EV: 4.0 mi/kWh @ 55.0p/kWh = Petrol: 44.0 mpg @ 133.9p/L
+        <br><small>Cost per mile: 13.8p</small>
     </div>
 </div>
 
 <script>
-    // Constants
-    const IMPERIAL_GALLON_TO_LITRE = 4.54609;
-
-    // Elements
-    const elements = {
-        evEfficiency: document.getElementById('ev-efficiency'),
-        electricityCost: document.getElementById('electricity-cost'),
-        petrolMpg: document.getElementById('petrol-mpg'),
-        petrolPrice: document.getElementById('petrol-price'),
-        chargingLosses: document.getElementById('charging-losses'),
-        chargingEfficiency: document.getElementById('charging-efficiency'),
-        comparison: document.getElementById('comparison'),
-        
-        // Value displays
-        evEfficiencyValue: document.getElementById('ev-efficiency-value'),
-        electricityCostValue: document.getElementById('electricity-cost-value'),
-        petrolMpgValue: document.getElementById('petrol-mpg-value'),
-        petrolPriceValue: document.getElementById('petrol-price-value'),
-        chargingEfficiencyValue: document.getElementById('charging-efficiency-value'),
-        
-        // Lock checkboxes
-        lockEvEfficiency: document.getElementById('lock-ev-efficiency'),
-        lockElectricityCost: document.getElementById('lock-electricity-cost'),
-        lockPetrolMpg: document.getElementById('lock-petrol-mpg'),
-        lockPetrolPrice: document.getElementById('lock-petrol-price'),
-        
-        // Groups
-        chargingLossesGroup: document.getElementById('charging-losses-group')
+    // Unit system: 'uk' or 'us'
+    let unitSystem = 'uk';
+    
+    // Conversion constants
+    const IMPERIAL_GALLON_TO_LITRES = 4.54609;
+    const US_GALLON_TO_LITRES = 3.78541;
+    
+    // Current values
+    let values = {
+        efficiency: 4.0,        // mi/kWh
+        electricityCost: 55.0,  // p/kWh
+        mpg: 44.0,             // miles per gallon
+        petrolCost: 133.9,     // p/L
+        chargingLosses: 10.0,  // percentage
+        includeLosses: false
+    };
+    
+    // Lock states
+    let locks = {
+        efficiency: false,
+        electricityCost: false,
+        mpg: false,
+        petrolCost: false
     };
 
-    // State
-    let isUpdating = false;
-
-    // Helper functions
-    function getLockedValues() {
-        const locked = [];
-        if (elements.lockEvEfficiency.checked) locked.push('evEfficiency');
-        if (elements.lockElectricityCost.checked) locked.push('electricityCost');
-        if (elements.lockPetrolMpg.checked) locked.push('petrolMpg');
-        if (elements.lockPetrolPrice.checked) locked.push('petrolPrice');
-        return locked;
+    function updateDisplay() {
+        const efficiencyUnit = unitSystem === 'uk' ? 'mi/kWh' : 'mi/kWh';
+        const electricityUnit = unitSystem === 'uk' ? 'p/kWh' : '¢/kWh';
+        const mpgUnit = unitSystem === 'uk' ? 'mpg' : 'mpg';
+        const petrolUnit = unitSystem === 'uk' ? 'p/L' : '¢/gal';
+        
+        document.getElementById('efficiencyValue').textContent = `${values.efficiency.toFixed(1)} ${efficiencyUnit}`;
+        document.getElementById('electricityCostValue').textContent = `${values.electricityCost.toFixed(1)} ${electricityUnit}`;
+        document.getElementById('mpgValue').textContent = `${values.mpg.toFixed(1)} ${mpgUnit}`;
+        document.getElementById('petrolCostValue').textContent = `${values.petrolCost.toFixed(1)} ${petrolUnit}`;
+        document.getElementById('lossesValue').textContent = `${values.chargingLosses.toFixed(1)}%`;
+        
+        updateEquivalenceDisplay();
     }
 
-    function updateSliderState() {
-        const locked = getLockedValues();
-        
-        // Update slider states
-        elements.evEfficiency.parentElement.classList.toggle('locked', elements.lockEvEfficiency.checked);
-        elements.electricityCost.parentElement.classList.toggle('locked', elements.lockElectricityCost.checked);
-        elements.petrolMpg.parentElement.classList.toggle('locked', elements.lockPetrolMpg.checked);
-        elements.petrolPrice.parentElement.classList.toggle('locked', elements.lockPetrolPrice.checked);
-        
-        // Disable lock checkboxes if 2 are already locked
-        if (locked.length >= 2) {
-            if (!elements.lockEvEfficiency.checked) elements.lockEvEfficiency.disabled = true;
-            if (!elements.lockElectricityCost.checked) elements.lockElectricityCost.disabled = true;
-            if (!elements.lockPetrolMpg.checked) elements.lockPetrolMpg.disabled = true;
-            if (!elements.lockPetrolPrice.checked) elements.lockPetrolPrice.disabled = true;
-        } else {
-            elements.lockEvEfficiency.disabled = false;
-            elements.lockElectricityCost.disabled = false;
-            elements.lockPetrolMpg.disabled = false;
-            elements.lockPetrolPrice.disabled = false;
-        }
-    }
-
-    function calculateCostPerMile() {
-        const evEfficiency = parseFloat(elements.evEfficiency.value);
-        const electricityCost = parseFloat(elements.electricityCost.value);
-        const chargingEfficiency = elements.chargingLosses.checked ? 
-            parseFloat(elements.chargingEfficiency.value) / 100 : 1;
-        
-        const evCostPerMile = (electricityCost / evEfficiency) / chargingEfficiency;
-        
-        const petrolMpg = parseFloat(elements.petrolMpg.value);
-        const petrolPricePerLitre = parseFloat(elements.petrolPrice.value);
-        const petrolPricePerGallon = petrolPricePerLitre * IMPERIAL_GALLON_TO_LITRE;
-        
-        const petrolCostPerMile = petrolPricePerGallon / petrolMpg;
-        
-        return { evCostPerMile, petrolCostPerMile };
-    }
-
-    function updateComparison() {
-        const { evCostPerMile, petrolCostPerMile } = calculateCostPerMile();
-        
-        const evCostPer100Miles = evCostPerMile * 100;
-        const petrolCostPer100Miles = petrolCostPerMile * 100;
-        
-        const savings = petrolCostPer100Miles - evCostPer100Miles;
-        const savingsPercent = (savings / petrolCostPer100Miles) * 100;
-        
-        let message = `EV: £${evCostPer100Miles.toFixed(2)} per 100 miles | `;
-        message += `Petrol: £${petrolCostPer100Miles.toFixed(2)} per 100 miles`;
-        
-        if (Math.abs(savings) > 0.01) {
-            if (savings > 0) {
-                message += ` | EV saves £${savings.toFixed(2)} (${savingsPercent.toFixed(0)}%)`;
-            } else {
-                message += ` | Petrol saves £${Math.abs(savings).toFixed(2)} (${Math.abs(savingsPercent).toFixed(0)}%)`;
-            }
-        } else {
-            message += ` | Costs are equivalent`;
+    function updateEquivalenceDisplay() {
+        // Calculate cost per mile for EV
+        let evCostPerMile = values.electricityCost / values.efficiency;
+        if (values.includeLosses) {
+            evCostPerMile *= (1 + values.chargingLosses / 100);
         }
         
-        elements.comparison.textContent = message;
+        // Calculate cost per mile for petrol
+        const gallonToLitres = unitSystem === 'uk' ? IMPERIAL_GALLON_TO_LITRES : US_GALLON_TO_LITRES;
+        const petrolCostPerMile = (values.petrolCost * gallonToLitres) / values.mpg;
+        
+        const efficiencyUnit = unitSystem === 'uk' ? 'mi/kWh' : 'mi/kWh';
+        const electricityUnit = unitSystem === 'uk' ? 'p/kWh' : '¢/kWh';
+        const mpgUnit = unitSystem === 'uk' ? 'mpg' : 'mpg';
+        const petrolUnit = unitSystem === 'uk' ? 'p/L' : '¢/gal';
+        const costUnit = unitSystem === 'uk' ? 'p' : '¢';
+        
+        let displayText = `EV: ${values.efficiency.toFixed(1)} ${efficiencyUnit} @ ${values.electricityCost.toFixed(1)}${electricityUnit}`;
+        if (values.includeLosses) {
+            displayText += ` (+${values.chargingLosses.toFixed(1)}% losses)`;
+        }
+        displayText += ` = Petrol: ${values.mpg.toFixed(1)} ${mpgUnit} @ ${values.petrolCost.toFixed(1)}${petrolUnit}`;
+        displayText += `<br><small>Cost per mile: ${evCostPerMile.toFixed(1)}${costUnit}</small>`;
+        
+        document.getElementById('equivalenceDisplay').innerHTML = displayText;
     }
 
-    function updateDisplayValues() {
-        elements.evEfficiencyValue.textContent = `${parseFloat(elements.evEfficiency.value).toFixed(1)} mi/kWh`;
-        elements.electricityCostValue.textContent = `${parseFloat(elements.electricityCost.value).toFixed(1)}p/kWh`;
-        elements.petrolMpgValue.textContent = `${parseFloat(elements.petrolMpg.value).toFixed(1)} mpg`;
-        elements.petrolPriceValue.textContent = `${parseFloat(elements.petrolPrice.value).toFixed(1)}p/L`;
-        elements.chargingEfficiencyValue.textContent = `${elements.chargingEfficiency.value}%`;
-    }
-
-    function adjustUnlockedValues(changedParameter) {
-        if (isUpdating) return;
-        isUpdating = true;
+    function updateCalculations(changedParam) {
+        // Count locked parameters
+        const lockedCount = Object.values(locks).filter(Boolean).length;
         
-        const locked = getLockedValues();
-        
-        // If less than 2 values are locked, just update the display
-        if (locked.length < 2) {
-            updateDisplayValues();
-            updateComparison();
-            isUpdating = false;
+        if (lockedCount >= 2) {
+            // If 2 parameters are locked, only update displays
+            updateSliderValues();
+            updateDisplay();
             return;
         }
         
-        // Get current cost per mile for both
-        const { evCostPerMile, petrolCostPerMile } = calculateCostPerMile();
+        // Calculate cost per mile for the changed side
+        let evCostPerMile, petrolCostPerMile;
+        const gallonToLitres = unitSystem === 'uk' ? IMPERIAL_GALLON_TO_LITRES : US_GALLON_TO_LITRES;
         
-        // Determine which side changed and which values to adjust
-        const evParams = ['evEfficiency', 'electricityCost'];
-        const petrolParams = ['petrolMpg', 'petrolPrice'];
-        
-        if (evParams.includes(changedParameter)) {
-            // EV changed, adjust petrol to match
-            const targetCostPerMile = evCostPerMile;
-            
-            if (!locked.includes('petrolMpg')) {
-                // Adjust MPG
-                const petrolPricePerLitre = parseFloat(elements.petrolPrice.value);
-                const petrolPricePerGallon = petrolPricePerLitre * IMPERIAL_GALLON_TO_LITRE;
-                const newMpg = petrolPricePerGallon / targetCostPerMile;
-                
-                if (newMpg >= 1 && newMpg <= 10000) {
-                    elements.petrolMpg.value = Math.min(200, newMpg);
-                    if (newMpg > 200) {
-                        elements.petrolMpgValue.textContent = `${newMpg.toFixed(1)} mpg`;
-                    }
-                }
-            } else if (!locked.includes('petrolPrice')) {
-                // Adjust petrol price
-                const petrolMpg = parseFloat(elements.petrolMpg.value);
-                const petrolCostPerGallon = targetCostPerMile * petrolMpg;
-                const newPricePerLitre = petrolCostPerGallon / IMPERIAL_GALLON_TO_LITRE;
-                
-                if (newPricePerLitre >= 0.1 && newPricePerLitre <= 1000) {
-                    elements.petrolPrice.value = Math.min(200, Math.max(10, newPricePerLitre));
-                    if (newPricePerLitre > 200 || newPricePerLitre < 10) {
-                        elements.petrolPriceValue.textContent = `${newPricePerLitre.toFixed(1)}p/L`;
-                    }
-                }
+        if (changedParam === 'efficiency' || changedParam === 'electricityCost') {
+            // EV side changed, calculate equivalent petrol values
+            evCostPerMile = values.electricityCost / values.efficiency;
+            if (values.includeLosses) {
+                evCostPerMile *= (1 + values.chargingLosses / 100);
             }
-        } else if (petrolParams.includes(changedParameter)) {
-            // Petrol changed, adjust EV to match
-            const targetCostPerMile = petrolCostPerMile;
-            const chargingEfficiency = elements.chargingLosses.checked ? 
-                parseFloat(elements.chargingEfficiency.value) / 100 : 1;
             
-            if (!locked.includes('evEfficiency')) {
-                // Adjust EV efficiency
-                const electricityCost = parseFloat(elements.electricityCost.value);
-                const newEfficiency = (electricityCost / targetCostPerMile) / chargingEfficiency;
-                
-                if (newEfficiency >= 0.1 && newEfficiency <= 100) {
-                    elements.evEfficiency.value = Math.min(10, Math.max(1, newEfficiency));
-                    if (newEfficiency > 10 || newEfficiency < 1) {
-                        elements.evEfficiencyValue.textContent = `${newEfficiency.toFixed(1)} mi/kWh`;
-                    }
+            // Update petrol values to match
+            if (!locks.mpg && !locks.petrolCost) {
+                // Neither petrol value is locked, keep ratio
+                const currentPetrolCostPerMile = (values.petrolCost * gallonToLitres) / values.mpg;
+                const ratio = evCostPerMile / currentPetrolCostPerMile;
+                values.petrolCost *= ratio;
+            } else if (!locks.mpg) {
+                // Petrol cost is locked, adjust MPG
+                values.mpg = (values.petrolCost * gallonToLitres) / evCostPerMile;
+            } else if (!locks.petrolCost) {
+                // MPG is locked, adjust petrol cost
+                values.petrolCost = (evCostPerMile * values.mpg) / gallonToLitres;
+            }
+        } else {
+            // Petrol side changed, calculate equivalent EV values
+            petrolCostPerMile = (values.petrolCost * gallonToLitres) / values.mpg;
+            
+            // Update EV values to match
+            if (!locks.efficiency && !locks.electricityCost) {
+                // Neither EV value is locked, keep ratio
+                let currentEvCostPerMile = values.electricityCost / values.efficiency;
+                if (values.includeLosses) {
+                    currentEvCostPerMile *= (1 + values.chargingLosses / 100);
                 }
-            } else if (!locked.includes('electricityCost')) {
-                // Adjust electricity cost
-                const evEfficiency = parseFloat(elements.evEfficiency.value);
-                const newElectricityCost = (targetCostPerMile * evEfficiency) * chargingEfficiency;
-                
-                if (newElectricityCost >= 0.01 && newElectricityCost <= 1000) {
-                    elements.electricityCost.value = Math.min(150, Math.max(0.1, newElectricityCost));
-                    if (newElectricityCost > 150 || newElectricityCost < 0.1) {
-                        elements.electricityCostValue.textContent = `${newElectricityCost.toFixed(1)}p/kWh`;
-                    }
+                const ratio = petrolCostPerMile / currentEvCostPerMile;
+                values.electricityCost *= ratio;
+            } else if (!locks.efficiency) {
+                // Electricity cost is locked, adjust efficiency
+                let targetCostPerKwh = petrolCostPerMile;
+                if (values.includeLosses) {
+                    targetCostPerKwh /= (1 + values.chargingLosses / 100);
+                }
+                values.efficiency = values.electricityCost / targetCostPerKwh;
+            } else if (!locks.electricityCost) {
+                // Efficiency is locked, adjust electricity cost
+                values.electricityCost = petrolCostPerMile * values.efficiency;
+                if (values.includeLosses) {
+                    values.electricityCost /= (1 + values.chargingLosses / 100);
                 }
             }
         }
         
-        updateDisplayValues();
-        updateComparison();
-        isUpdating = false;
+        updateSliderValues();
+        updateDisplay();
     }
 
-    // Event listeners
-    elements.evEfficiency.addEventListener('input', () => adjustUnlockedValues('evEfficiency'));
-    elements.electricityCost.addEventListener('input', () => adjustUnlockedValues('electricityCost'));
-    elements.petrolMpg.addEventListener('input', () => adjustUnlockedValues('petrolMpg'));
-    elements.petrolPrice.addEventListener('input', () => adjustUnlockedValues('petrolPrice'));
-    
-    elements.chargingLosses.addEventListener('change', (e) => {
-        elements.chargingLossesGroup.style.display = e.target.checked ? 'block' : 'none';
-        updateComparison();
-    });
-    
-    elements.chargingEfficiency.addEventListener('input', () => {
-        updateDisplayValues();
-        updateComparison();
-    });
-    
-    // Lock checkbox listeners
-    [elements.lockEvEfficiency, elements.lockElectricityCost, 
-     elements.lockPetrolMpg, elements.lockPetrolPrice].forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            updateSliderState();
-            updateComparison();
-        });
+    function updateSliderValues() {
+        document.getElementById('efficiencySlider').value = Math.max(1, Math.min(10, values.efficiency));
+        document.getElementById('electricityCostSlider').value = Math.max(0.1, Math.min(150, values.electricityCost));
+        document.getElementById('mpgSlider').value = Math.max(1, Math.min(200, values.mpg));
+        document.getElementById('petrolCostSlider').value = Math.max(10, Math.min(200, values.petrolCost));
+    }
+
+    function updateFromSlider(param) {
+        switch(param) {
+            case 'efficiency':
+                values.efficiency = parseFloat(document.getElementById('efficiencySlider').value);
+                break;
+            case 'electricityCost':
+                values.electricityCost = parseFloat(document.getElementById('electricityCostSlider').value);
+                break;
+            case 'mpg':
+                values.mpg = parseFloat(document.getElementById('mpgSlider').value);
+                break;
+            case 'petrolCost':
+                values.petrolCost = parseFloat(document.getElementById('petrolCostSlider').value);
+                break;
+        }
+    }
+
+    // Event handlers for sliders
+    document.getElementById('efficiencySlider').addEventListener('input', function() {
+        updateFromSlider('efficiency');
+        updateCalculations('efficiency');
     });
 
+    document.getElementById('electricityCostSlider').addEventListener('input', function() {
+        updateFromSlider('electricityCost');
+        updateCalculations('electricityCost');
+    });
+
+    document.getElementById('mpgSlider').addEventListener('input', function() {
+        updateFromSlider('mpg');
+        updateCalculations('mpg');
+    });
+
+    document.getElementById('petrolCostSlider').addEventListener('input', function() {
+        updateFromSlider('petrolCost');
+        updateCalculations('petrolCost');
+    });
+
+    function updateLocks() {
+        locks.efficiency = document.getElementById('lockEfficiency').checked;
+        locks.electricityCost = document.getElementById('lockElectricityCost').checked;
+        locks.mpg = document.getElementById('lockMpg').checked;
+        locks.petrolCost = document.getElementById('lockPetrolCost').checked;
+        
+        // Ensure maximum 2 locks
+        const lockedCount = Object.values(locks).filter(Boolean).length;
+        if (lockedCount > 2) {
+            // Find the most recently checked box and uncheck others
+            const checkboxes = ['lockEfficiency', 'lockElectricityCost', 'lockMpg', 'lockPetrolCost'];
+            let checkedBoxes = [];
+            
+            checkboxes.forEach(id => {
+                if (document.getElementById(id).checked) {
+                    checkedBoxes.push(id);
+                }
+            });
+            
+            // Keep only the last 2 checked
+            if (checkedBoxes.length > 2) {
+                for (let i = 0; i < checkedBoxes.length - 2; i++) {
+                    document.getElementById(checkedBoxes[i]).checked = false;
+                    const param = checkedBoxes[i].replace('lock', '').toLowerCase();
+                    if (param === 'electricitycost') locks.electricityCost = false;
+                    else if (param === 'petrolcost') locks.petrolCost = false;
+                    else locks[param] = false;
+                }
+            }
+        }
+    }
+
+    function toggleLosses() {
+        values.includeLosses = document.getElementById('includeLosses').checked;
+        document.getElementById('lossesSlider').disabled = !values.includeLosses;
+        updateCalculations('efficiency'); // Recalculate with/without losses
+    }
+
+    function updateLosses() {
+        values.chargingLosses = parseFloat(document.getElementById('lossesSlider').value);
+        updateDisplay();
+        if (values.includeLosses) {
+            updateCalculations('efficiency');
+        }
+    }
+
+    function toggleUnits() {
+        // This is a placeholder for unit conversion
+        // In a full implementation, you would convert all values between UK and US units
+        if (unitSystem === 'uk') {
+            unitSystem = 'us';
+            // Convert values to US units
+            // values.petrolCost = values.petrolCost * US_GALLON_TO_LITRES / IMPERIAL_GALLON_TO_LITRES;
+            alert('US units not fully implemented in this demo. This would convert pence/litre to cents/gallon, etc.');
+            unitSystem = 'uk'; // Revert for now
+        } else {
+            unitSystem = 'uk';
+        }
+        updateDisplay();
+    }
+
     // Initialize
-    updateDisplayValues();
-    updateComparison();
-    updateSliderState();
+    updateDisplay();
 </script>
 ```
 
