@@ -369,6 +369,95 @@
             border-radius: 8px;
         }
 
+        .usage-calculator {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+        }
+
+        .usage-calculator:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .usage-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .usage-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .usage-input-group, .usage-output-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .usage-label {
+            font-weight: 500;
+            color: #34495e;
+        }
+
+
+        .usage-select {
+            padding: 8px 12px;
+            border: 2px solid #dfe6e9;
+            border-radius: 5px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .usage-select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .usage-results {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .usage-cost-display {
+            text-align: center;
+        }
+
+        .usage-cost-value {
+            font-weight: 700;
+            font-size: 1.8em;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (max-width: 768px) {
+            .usage-input-group, .usage-output-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .usage-inputs {
+                gap: 20px;
+            }
+        }
+
         .copyright {
             text-align: center;
             margin-top: 15px;
@@ -490,17 +579,56 @@
             </div>
         </div>
 
-
-        <div class="equivalence-display" id="equivalence-display">
-            Cost per mile: 0.00p
-        </div>
-
         <div class="lock-explanation">
             <div style="margin-bottom: 10px;">Tick up to two checkboxes to lock parameters while adjusting others:</div>
             <div style="display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 1.2em;">
                 <span>☐ Unlocked</span>
                 <span>→</span>
                 <span>🔒 Locked</span>
+            </div>
+        </div>
+
+
+        <div class="equivalence-display" id="equivalence-display">
+            Cost per mile: 0.00p
+        </div>
+
+        <div class="usage-calculator">
+            <h3 class="usage-title">Usage Cost Calculator</h3>
+            <div class="usage-inputs">
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span class="label-text">I drive</span>
+                        <div class="value-container">
+                            <input type="number" class="value-display" id="usage-distance-display" value="150" step="1" min="1">
+                            <span id="usage-distance-unit" class="unit-label">miles</span>
+                            <span class="usage-label">per</span>
+                            <select id="usage-period" class="usage-select">
+                                <option value="day">day</option>
+                                <option value="week" selected>week</option>
+                                <option value="month">month</option>
+                                <option value="year">year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="usage-distance" value="150">
+                    </div>
+                </div>
+                <div class="usage-output-group">
+                    <span class="usage-label">Show costs per:</span>
+                    <select id="output-period" class="usage-select">
+                        <option value="day">day</option>
+                        <option value="week">week</option>
+                        <option value="month" selected>month</option>
+                        <option value="year">year</option>
+                    </select>
+                </div>
+            </div>
+            <div class="usage-results" id="usage-results">
+                <div class="usage-cost-display">
+                    <span class="usage-cost-value" id="usage-cost-value">£32.50 per month</span>
+                </div>
             </div>
         </div>
 
@@ -527,7 +655,11 @@
             evEfficiencyUnit: 'mi/kWh',
             fuelEfficiencyUnit: 'mpgUK',
             fuelCostUnit: 'L',
-            evCostUnit: 'p/kWh'
+            evCostUnit: 'p/kWh',
+            usageDistance: 150,
+            usagePeriod: 'week',
+            outputPeriod: 'month',
+            usageAnnualDistance: 7821.43 // Store the canonical annual distance
         };
 
         let isUpdating = false; // Prevent circular updates
@@ -559,7 +691,13 @@
             equivalenceDisplay: document.getElementById('equivalence-display'),
             evEfficiencyUnit: document.getElementById('ev-efficiency-unit'),
             fuelEfficiencyUnit: document.getElementById('fuel-efficiency-unit'),
-            fuelCostUnit: document.getElementById('fuel-cost-unit')
+            fuelCostUnit: document.getElementById('fuel-cost-unit'),
+            usageDistance: document.getElementById('usage-distance'),
+            usageDistanceDisplay: document.getElementById('usage-distance-display'),
+            usagePeriod: document.getElementById('usage-period'),
+            outputPeriod: document.getElementById('output-period'),
+            usageDistanceUnit: document.getElementById('usage-distance-unit'),
+            usageCostValue: document.getElementById('usage-cost-value')
         };
 
         // Unit conversion functions
@@ -680,6 +818,13 @@
             return 'p';
         }
         
+        function getMainCurrencySymbol() {
+            if (state.evCostUnit.includes('p/')) return '£';
+            if (state.evCostUnit.includes('¢/')) return '$';
+            if (state.evCostUnit.includes('c/')) return '€';
+            return '£';
+        }
+        
         function getFuelVolumeUnit() {
             return state.fuelCostUnit; // Now directly returns 'L', 'galUK', or 'galUS'
         }
@@ -759,6 +904,133 @@
             return costPerGallon / efficiency;
         }
 
+        // Usage calculation functions
+        function convertUsageToDaily(distance, period) {
+            switch(period) {
+                case 'day': return distance;
+                case 'week': return distance / 7;
+                case 'month': return distance / 30.44; // Average days per month
+                case 'year': return distance / 365.25; // Including leap years
+                default: return distance;
+            }
+        }
+
+        function convertDailyToOutputPeriod(dailyDistance, outputPeriod) {
+            switch(outputPeriod) {
+                case 'day': return dailyDistance;
+                case 'week': return dailyDistance * 7;
+                case 'month': return dailyDistance * 30.44;
+                case 'year': return dailyDistance * 365.25;
+                default: return dailyDistance;
+            }
+        }
+
+        function convertUsageToAnnual(distance, period) {
+            switch(period) {
+                case 'day': return distance * 365.25;
+                case 'week': return distance * 52.1429; // 365.25 / 7
+                case 'month': return distance * 12;
+                case 'year': return distance;
+                default: return distance;
+            }
+        }
+
+        function convertAnnualToUsagePeriod(annualDistance, period) {
+            switch(period) {
+                case 'day': return annualDistance / 365.25;
+                case 'week': return annualDistance / 52.1429;
+                case 'month': return annualDistance / 12;
+                case 'year': return annualDistance;
+                default: return annualDistance;
+            }
+        }
+
+        function getCurrentPeriodDistance() {
+            return convertAnnualToUsagePeriod(state.usageAnnualDistance, state.usagePeriod);
+        }
+
+        function updateUsageSliderRange() {
+            // Define annual mileage range (0 to 20,000 miles/year)
+            const minAnnual = 0;
+            const maxAnnual = 20000;
+            
+            // Convert to current period
+            const minForPeriod = convertAnnualToUsagePeriod(minAnnual, state.usagePeriod);
+            const maxForPeriod = convertAnnualToUsagePeriod(maxAnnual, state.usagePeriod);
+            
+            // Update slider range
+            elements.usageDistance.min = Math.round(minForPeriod);
+            elements.usageDistance.max = Math.round(maxForPeriod);
+            
+            // Set appropriate step size
+            if (state.usagePeriod === 'day') {
+                elements.usageDistance.step = '1';
+            } else if (state.usagePeriod === 'week') {
+                elements.usageDistance.step = '5';
+            } else if (state.usagePeriod === 'month') {
+                elements.usageDistance.step = '25';
+            } else { // year
+                elements.usageDistance.step = '100';
+            }
+            
+            // Update the current distance for display
+            const currentDistance = getCurrentPeriodDistance();
+            state.usageDistance = Math.round(currentDistance);
+        }
+
+        function calculateUsageCosts() {
+            // Convert input distance to daily distance
+            const dailyDistance = convertUsageToDaily(state.usageDistance, state.usagePeriod);
+            
+            // Convert to output period distance
+            const outputDistance = convertDailyToOutputPeriod(dailyDistance, state.outputPeriod);
+            
+            // Get cost per mile (functions always return cost per mile)
+            const evCostPerMile = calculateEvCostPerMile();
+            const petrolCostPerMile = calculatePetrolCostPerMile();
+            
+            // Check if we need to convert to cost per km
+            const isMetric = state.evEfficiencyUnit.includes('km');
+            let evCostPerUnit = evCostPerMile;
+            let petrolCostPerUnit = petrolCostPerMile;
+            
+            if (isMetric) {
+                // Convert from cost per mile to cost per km
+                evCostPerUnit = evCostPerMile / KM_PER_MILE;
+                petrolCostPerUnit = petrolCostPerMile / KM_PER_MILE;
+            }
+            
+            // Calculate total costs for the output period
+            const evTotalCost = evCostPerUnit * outputDistance;
+            const petrolTotalCost = petrolCostPerUnit * outputDistance;
+            const savings = petrolTotalCost - evTotalCost;
+            
+            return {
+                evCost: evTotalCost,
+                petrolCost: petrolTotalCost,
+                savings: savings,
+                outputDistance: outputDistance
+            };
+        }
+
+        function updateUsageDisplay() {
+            // Update distance unit based on EV efficiency unit
+            const isMetric = state.evEfficiencyUnit.includes('km');
+            const distanceUnit = isMetric ? 'km' : 'miles';
+            elements.usageDistanceUnit.textContent = distanceUnit;
+            
+            // Calculate cost (use EV cost as they should be equal due to equivalence)
+            const costs = calculateUsageCosts();
+            const currency = getMainCurrencySymbol();
+            
+            // Format cost in main currency (pounds, dollars, euros)
+            const cost = `${currency}${costs.evCost.toFixed(2)}`;
+            const periodText = state.outputPeriod;
+            
+            // Update display
+            elements.usageCostValue.textContent = `${cost} per ${periodText}`;
+        }
+
         // Update displays
         function updateDisplays() {
             if (isUpdating) return; // Prevent circular updates
@@ -777,6 +1049,12 @@
             if (document.activeElement !== elements.petrolCostDisplay) {
                 elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
             }
+            if (document.activeElement !== elements.usageDistanceDisplay) {
+                elements.usageDistanceDisplay.value = state.usageDistance.toString();
+            }
+            
+            // Update sliders to match displays
+            elements.usageDistance.value = state.usageDistance;
             
             // Update unit labels - no longer needed as unit is now in selector
             
@@ -800,6 +1078,9 @@
             } else {
                 elements.equivalenceDisplay.textContent = `Cost per mile: ${(costPerMile * 100).toFixed(2)}${currency}`;
             }
+            
+            // Update usage calculator display
+            updateUsageDisplay();
             
             isUpdating = false; // Reset flag
         }
@@ -1186,8 +1467,51 @@
             updateDisplays();
         });
 
+        // Usage calculator event listeners
+        elements.usageDistance.addEventListener('input', (e) => {
+            if (isUpdating) return;
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value) && value >= 0) {
+                state.usageDistance = value;
+                // Update the annual distance as the source of truth
+                state.usageAnnualDistance = convertUsageToAnnual(value, state.usagePeriod);
+                updateDisplays();
+            }
+        });
+
+        elements.usageDistanceDisplay.addEventListener('blur', (e) => {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value) && value >= 0) {
+                state.usageDistance = value;
+                // Update the annual distance as the source of truth
+                state.usageAnnualDistance = convertUsageToAnnual(value, state.usagePeriod);
+                elements.usageDistance.value = value;
+                updateDisplays();
+            } else {
+                // Reset to current state value if invalid
+                e.target.value = state.usageDistance.toString();
+            }
+        });
+
+        elements.usagePeriod.addEventListener('change', (e) => {
+            // Update period (annual distance stays the same)
+            state.usagePeriod = e.target.value;
+            
+            // Update slider range and current distance for new period
+            updateUsageSliderRange();
+            
+            // Update displays
+            updateDisplays();
+        });
+
+        elements.outputPeriod.addEventListener('change', (e) => {
+            state.outputPeriod = e.target.value;
+            updateUsageDisplay();
+        });
+
         // Initialize
         updateSliderRanges();
+        updateUsageSliderRange();
         updateDisplays();
     </script>
 </body>
