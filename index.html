@@ -764,10 +764,19 @@
             if (isUpdating) return; // Prevent circular updates
             isUpdating = true;
             
-            elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(1);
-            elements.evCostDisplay.value = state.evCost.toFixed(1);
-            elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
-            elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
+            // Only update input values if they're not currently focused (being edited)
+            if (document.activeElement !== elements.evEfficiencyDisplay) {
+                elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(1);
+            }
+            if (document.activeElement !== elements.evCostDisplay) {
+                elements.evCostDisplay.value = state.evCost.toFixed(1);
+            }
+            if (document.activeElement !== elements.petrolEfficiencyDisplay) {
+                elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
+            }
+            if (document.activeElement !== elements.petrolCostDisplay) {
+                elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
+            }
             
             // Update unit labels - no longer needed as unit is now in selector
             
@@ -967,44 +976,56 @@
             updateDisplays();
         });
 
-        // Value display input event listeners
-        elements.evEfficiencyDisplay.addEventListener('input', (e) => {
+        // Value display input event listeners - use blur and change events to avoid jumping values while typing
+        elements.evEfficiencyDisplay.addEventListener('blur', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.evEfficiency = value;
                 elements.evEfficiency.value = value;
                 maintainEquivalence('evEfficiency');
                 updateDisplays();
+            } else {
+                // Reset to current state value if invalid
+                e.target.value = state.evEfficiency.toFixed(1);
             }
         });
 
-        elements.evCostDisplay.addEventListener('input', (e) => {
+        elements.evCostDisplay.addEventListener('blur', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.evCost = value;
                 elements.evCost.value = value;
                 maintainEquivalence('evCost');
                 updateDisplays();
+            } else {
+                // Reset to current state value if invalid
+                e.target.value = state.evCost.toFixed(1);
             }
         });
 
-        elements.petrolEfficiencyDisplay.addEventListener('input', (e) => {
+        elements.petrolEfficiencyDisplay.addEventListener('blur', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.petrolEfficiency = value;
                 elements.petrolEfficiency.value = value;
                 maintainEquivalence('petrolEfficiency');
                 updateDisplays();
+            } else {
+                // Reset to current state value if invalid
+                e.target.value = state.petrolEfficiency.toFixed(1);
             }
         });
 
-        elements.petrolCostDisplay.addEventListener('input', (e) => {
+        elements.petrolCostDisplay.addEventListener('blur', (e) => {
             const value = parseFloat(e.target.value);
             if (!isNaN(value) && value > 0) {
                 state.petrolCost = value;
                 elements.petrolCost.value = value;
                 maintainEquivalence('petrolCost');
                 updateDisplays();
+            } else {
+                // Reset to current state value if invalid
+                e.target.value = state.petrolCost.toFixed(1);
             }
         });
 
