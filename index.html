@@ -492,8 +492,26 @@
             }
             
             .value-container {
-                align-self: stretch;
-                justify-content: space-between;
+                display: grid;
+                grid-template-columns: auto 1fr auto auto;
+                gap: 8px;
+                align-items: center;
+                width: 100%;
+            }
+            
+            .value-display {
+                width: auto;
+                min-width: 60px;
+            }
+            
+            .usage-label {
+                font-size: 0.9em;
+                white-space: nowrap;
+            }
+            
+            .usage-select {
+                min-width: 0;
+                flex-shrink: 1;
             }
         }
 
