@@ -716,13 +716,13 @@
             if (fromUnit === 'km/kWh') {
                 miPerKwh = value * MILES_PER_KM;
             } else if (fromUnit === 'kWh/100mi') {
-                miPerKwh = 100 / value;
+                miPerKwh = value > 0 ? 100 / value : 0.1;
             } else if (fromUnit === 'kWh/100km') {
-                miPerKwh = (100 / KM_PER_MILE) / value;
+                miPerKwh = value > 0 ? (100 / KM_PER_MILE) / value : 0.1;
             } else if (fromUnit === 'Wh/mi') {
-                miPerKwh = 1000 / value;
+                miPerKwh = value > 0 ? 1000 / value : 0.1;
             } else if (fromUnit === 'Wh/km') {
-                miPerKwh = (1000 / KM_PER_MILE) / value;
+                miPerKwh = value > 0 ? (1000 / KM_PER_MILE) / value : 0.1;
             } else if (fromUnit !== 'mi/kWh') {
                 miPerKwh = value; // Default fallback for unsupported units
             }
@@ -733,13 +733,13 @@
             } else if (toUnit === 'km/kWh') {
                 return miPerKwh * KM_PER_MILE;
             } else if (toUnit === 'kWh/100mi') {
-                return 100 / miPerKwh;
+                return miPerKwh > 0 ? 100 / miPerKwh : 100;
             } else if (toUnit === 'kWh/100km') {
-                return 100 / (miPerKwh * KM_PER_MILE);
+                return miPerKwh > 0 ? (100 * KM_PER_MILE) / miPerKwh : (100 * KM_PER_MILE);
             } else if (toUnit === 'Wh/mi') {
-                return 1000 / miPerKwh;
+                return miPerKwh > 0 ? 1000 / miPerKwh : 1000;
             } else if (toUnit === 'Wh/km') {
-                return (1000 / miPerKwh) * MILES_PER_KM;
+                return miPerKwh > 0 ? (1000 / miPerKwh) * KM_PER_MILE : (1000 * KM_PER_MILE);
             }
             
             return miPerKwh;
@@ -762,7 +762,7 @@
                 mpgUK = (value / KM_PER_MILE) * LITRES_PER_UK_GALLON;
             } else if (fromUnit === 'L/100km') {
                 // L/100km to mpgUK: (100km in miles) * (UK gallon in litres) / (L per 100km)
-                mpgUK = (100 / KM_PER_MILE) * LITRES_PER_UK_GALLON / value;
+                mpgUK = value > 0 ? (100 / KM_PER_MILE) * LITRES_PER_UK_GALLON / value : 0.1;
             }
             
             // Convert from mpgUK to target
@@ -774,7 +774,7 @@
                 return (mpgUK * KM_PER_MILE) / LITRES_PER_UK_GALLON;
             } else if (toUnit === 'L/100km') {
                 // mpgUK to L/100km: (100km in miles) * (UK gallon in litres) / mpgUK
-                return (100 / KM_PER_MILE) * LITRES_PER_UK_GALLON / mpgUK;
+                return mpgUK > 0 ? (100 / KM_PER_MILE) * LITRES_PER_UK_GALLON / mpgUK : (100 / KM_PER_MILE) * LITRES_PER_UK_GALLON;
             }
             
             return mpgUK;
@@ -835,11 +835,15 @@
             // Convert to standard unit (p/kWh) first
             let pPerKwh = value;
             
+            // IMPORTANT: Currency conversions assume 1:1 equivalence for comparison purposes
+            // This does NOT reflect real exchange rates (1p ≠ 1¢ ≠ 1c in reality)
+            // The calculator focuses on relative cost comparisons within the same currency system
+            
             // From conversions to p/kWh
             if (fromUnit === '¢/kWh') {
-                pPerKwh = value; // 1:1 conversion for display purposes
+                pPerKwh = value; // 1:1 conversion for display consistency
             } else if (fromUnit === 'c/kWh') {
-                pPerKwh = value; // 1:1 conversion for display purposes
+                pPerKwh = value; // 1:1 conversion for display consistency
             } else if (fromUnit === 'p/Wh') {
                 pPerKwh = value * 1000; // 1000 Wh = 1 kWh
             } else if (fromUnit === '¢/Wh') {
@@ -852,9 +856,9 @@
             if (toUnit === 'p/kWh') {
                 return pPerKwh;
             } else if (toUnit === '¢/kWh') {
-                return pPerKwh; // 1:1 conversion for display purposes
+                return pPerKwh; // 1:1 conversion for display consistency
             } else if (toUnit === 'c/kWh') {
-                return pPerKwh; // 1:1 conversion for display purposes
+                return pPerKwh; // 1:1 conversion for display consistency
             } else if (toUnit === 'p/Wh') {
                 return pPerKwh / 1000;
             } else if (toUnit === '¢/Wh') {
@@ -905,12 +909,18 @@
         }
 
         // Usage calculation functions
+        // Standardized time period constants
+        const DAYS_PER_YEAR = 365.25; // Including leap years
+        const WEEKS_PER_YEAR = DAYS_PER_YEAR / 7; // 52.1786
+        const MONTHS_PER_YEAR = 12;
+        const DAYS_PER_MONTH = DAYS_PER_YEAR / MONTHS_PER_YEAR; // 30.4375
+
         function convertUsageToDaily(distance, period) {
             switch(period) {
                 case 'day': return distance;
                 case 'week': return distance / 7;
-                case 'month': return distance / 30.44; // Average days per month
-                case 'year': return distance / 365.25; // Including leap years
+                case 'month': return distance / DAYS_PER_MONTH;
+                case 'year': return distance / DAYS_PER_YEAR;
                 default: return distance;
             }
         }
@@ -919,17 +929,17 @@
             switch(outputPeriod) {
                 case 'day': return dailyDistance;
                 case 'week': return dailyDistance * 7;
-                case 'month': return dailyDistance * 30.44;
-                case 'year': return dailyDistance * 365.25;
+                case 'month': return dailyDistance * DAYS_PER_MONTH;
+                case 'year': return dailyDistance * DAYS_PER_YEAR;
                 default: return dailyDistance;
             }
         }
 
         function convertUsageToAnnual(distance, period) {
             switch(period) {
-                case 'day': return distance * 365.25;
-                case 'week': return distance * 52.1429; // 365.25 / 7
-                case 'month': return distance * 12;
+                case 'day': return distance * DAYS_PER_YEAR;
+                case 'week': return distance * WEEKS_PER_YEAR;
+                case 'month': return distance * MONTHS_PER_YEAR;
                 case 'year': return distance;
                 default: return distance;
             }
@@ -937,9 +947,9 @@
 
         function convertAnnualToUsagePeriod(annualDistance, period) {
             switch(period) {
-                case 'day': return annualDistance / 365.25;
-                case 'week': return annualDistance / 52.1429;
-                case 'month': return annualDistance / 12;
+                case 'day': return annualDistance / DAYS_PER_YEAR;
+                case 'week': return annualDistance / WEEKS_PER_YEAR;
+                case 'month': return annualDistance / MONTHS_PER_YEAR;
                 case 'year': return annualDistance;
                 default: return annualDistance;
             }
@@ -1087,33 +1097,57 @@
 
         // Update slider ranges based on units
         function updateSliderRanges() {
-            // EV efficiency ranges
-            if (state.evEfficiencyUnit === 'mi/kWh' || state.evEfficiencyUnit === 'km/kWh') {
+            // EV efficiency ranges - all equivalent to 1-10 mi/kWh
+            if (state.evEfficiencyUnit === 'mi/kWh') {
                 elements.evEfficiency.min = 1;
                 elements.evEfficiency.max = 10;
                 elements.evEfficiency.step = 0.1;
-            } else if (state.evEfficiencyUnit === 'kWh/100mi' || state.evEfficiencyUnit === 'kWh/100km') {
+            } else if (state.evEfficiencyUnit === 'km/kWh') {
+                // 1-10 mi/kWh = 1.61-16.1 km/kWh
+                elements.evEfficiency.min = 1.6;
+                elements.evEfficiency.max = 16.1;
+                elements.evEfficiency.step = 0.1;
+            } else if (state.evEfficiencyUnit === 'kWh/100mi') {
+                // 1-10 mi/kWh = 100-10 kWh/100mi (inverted)
                 elements.evEfficiency.min = 10;
                 elements.evEfficiency.max = 100;
                 elements.evEfficiency.step = 0.5;
-            } else if (state.evEfficiencyUnit === 'Wh/mi' || state.evEfficiencyUnit === 'Wh/km') {
+            } else if (state.evEfficiencyUnit === 'kWh/100km') {
+                // 1-10 mi/kWh = 160.9-16.1 kWh/100km (inverted, with km conversion)
+                elements.evEfficiency.min = 16.1;
+                elements.evEfficiency.max = 160.9;
+                elements.evEfficiency.step = 1;
+            } else if (state.evEfficiencyUnit === 'Wh/mi') {
+                // 1-10 mi/kWh = 1000-100 Wh/mi (inverted, kWh to Wh)
                 elements.evEfficiency.min = 100;
                 elements.evEfficiency.max = 1000;
-                elements.evEfficiency.step = 5;
+                elements.evEfficiency.step = 10;
+            } else if (state.evEfficiencyUnit === 'Wh/km') {
+                // 1-10 mi/kWh = 1609-161 Wh/km (inverted, with km/Wh conversion)
+                elements.evEfficiency.min = 161;
+                elements.evEfficiency.max = 1609;
+                elements.evEfficiency.step = 10;
             }
             
-            // Fuel efficiency ranges
-            if (state.fuelEfficiencyUnit === 'mpgUK' || state.fuelEfficiencyUnit === 'mpgUS') {
-                elements.petrolEfficiency.min = 1;
-                elements.petrolEfficiency.max = 200;
-                elements.petrolEfficiency.step = 0.1;
+            // Fuel efficiency ranges - all equivalent to 10-80 mpgUK (realistic car range)
+            if (state.fuelEfficiencyUnit === 'mpgUK') {
+                elements.petrolEfficiency.min = 10;
+                elements.petrolEfficiency.max = 80;
+                elements.petrolEfficiency.step = 0.5;
+            } else if (state.fuelEfficiencyUnit === 'mpgUS') {
+                // 10-80 mpgUK = 8.3-66.6 mpgUS
+                elements.petrolEfficiency.min = 8.3;
+                elements.petrolEfficiency.max = 66.6;
+                elements.petrolEfficiency.step = 0.5;
             } else if (state.fuelEfficiencyUnit === 'km/L') {
-                elements.petrolEfficiency.min = 1;
-                elements.petrolEfficiency.max = 50;
+                // 10-80 mpgUK = 3.5-28.2 km/L
+                elements.petrolEfficiency.min = 3.5;
+                elements.petrolEfficiency.max = 28.2;
                 elements.petrolEfficiency.step = 0.1;
             } else if (state.fuelEfficiencyUnit === 'L/100km') {
-                elements.petrolEfficiency.min = 1;
-                elements.petrolEfficiency.max = 50;
+                // 10-80 mpgUK = 28.2-3.5 L/100km (inverted)
+                elements.petrolEfficiency.min = 3.5;
+                elements.petrolEfficiency.max = 28.2;
                 elements.petrolEfficiency.step = 0.1;
             }
             
@@ -1218,7 +1252,7 @@
         function adjustEvCost(petrolCostPerMile) {
             let targetCostInP = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
             if (state.includeChargingLosses) {
-                targetCostInP /= (1 + state.chargingLosses / 100);
+                targetCostInP *= (1 + state.chargingLosses / 100);
             }
             
             // Convert from p/kWh to current unit
