@@ -604,12 +604,13 @@
                                 <option value="kWh/100km">kWh/100km</option>
                                 <option value="Wh/mi">Wh/mi</option>
                                 <option value="Wh/km">Wh/km</option>
+                                <option value="m/kJ">m/kJ</option>
+                                <option value="J/m">J/m</option>
                             </select>
                         </div>
                     </div>
                     <div class="slider-container">
                         <input type="range" id="ev-efficiency" min="1" max="10" step="0.1" value="4">
-                        <input type="checkbox" class="lock-checkbox" id="lock-ev-efficiency">
                     </div>
                 </div>
 
@@ -625,12 +626,14 @@
                                 <option value="p/Wh">p/Wh</option>
                                 <option value="¢/Wh">¢/Wh</option>
                                 <option value="c/Wh">c/Wh</option>
+                                <option value="p/MJ">p/MJ</option>
+                                <option value="¢/MJ">¢/MJ</option>
+                                <option value="c/MJ">c/MJ</option>
                             </select>
                         </div>
                     </div>
                     <div class="slider-container">
                         <input type="range" id="ev-cost" min="0.1" max="150" step="0.1" value="55">
-                        <input type="checkbox" class="lock-checkbox" id="lock-ev-cost">
                     </div>
                 </div>
             </div>
@@ -656,7 +659,6 @@
                     </div>
                     <div class="slider-container">
                         <input type="range" id="petrol-efficiency" min="1" max="200" step="0.1" value="44">
-                        <input type="checkbox" class="lock-checkbox" id="lock-petrol-efficiency">
                     </div>
                 </div>
 
@@ -665,16 +667,16 @@
                         <span class="label-text">Fuel Cost</span>
                         <div class="value-container">
                             <input type="number" class="value-display" id="petrol-cost-display" value="133.9" step="0.1" min="0.1">
+                            <span id="fuel-cost-unit-display" class="unit-label">p per</span>
                             <select id="fuel-cost-unit" class="unit-select">
-                                <option value="L">per litre</option>
-                                <option value="galUS">per US gal</option>
-                                <option value="galUK">per UK gal</option>
+                                <option value="L">litre</option>
+                                <option value="galUS">US gallon</option>
+                                <option value="galUK">UK gallon</option>
                             </select>
                         </div>
                     </div>
                     <div class="slider-container">
                         <input type="range" id="petrol-cost" min="10" max="200" step="0.1" value="133.9">
-                        <input type="checkbox" class="lock-checkbox" id="lock-petrol-cost">
                     </div>
                 </div>
             </div>
@@ -691,14 +693,6 @@
             </div>
         </div>
 
-        <div class="lock-explanation">
-            <div style="margin-bottom: 10px;">Tick up to two checkboxes to lock parameters while adjusting others:</div>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 1.2em;">
-                <span>☐ Unlocked</span>
-                <span>→</span>
-                <span>🔒 Locked</span>
-            </div>
-        </div>
 
 
         <div class="equivalence-display" id="equivalence-display">
@@ -750,11 +744,11 @@
     </div>
 
     <script>
-        // Constants
-        const LITRES_PER_UK_GALLON = 4.54609;
-        const LITRES_PER_US_GALLON = 3.78541;
-        const KM_PER_MILE = 1.60934;
-        const MILES_PER_KM = 0.621371;
+        // Constants - using exact definitions where possible
+        const LITRES_PER_UK_GALLON = 4.54609; // Exact definition
+        const LITRES_PER_US_GALLON = 3.785411784; // Exact definition
+        const KM_PER_MILE = 1.609344; // Exact definition (international mile)
+        const MILES_PER_KM = 1 / 1.609344; // Computed from exact mile definition
         
         // State
         let state = {
@@ -774,14 +768,72 @@
             usageAnnualDistance: 7821.43 // Store the canonical annual distance
         };
 
+        // Track when each parameter was last modified for virtual locking
+        let lastModified = {
+            evEfficiency: Date.now(),
+            evCost: Date.now() - 1000,
+            petrolEfficiency: Date.now() - 2000,
+            petrolCost: Date.now() - 3000
+        };
+
         let isUpdating = false; // Prevent circular updates
 
-        let locks = {
-            evEfficiency: false,
-            evCost: false,
-            petrolEfficiency: false,
-            petrolCost: false
-        };
+        // Function to update last modified timestamp for a parameter
+        function updateLastModified(parameter) {
+            lastModified[parameter] = Date.now();
+        }
+
+        // Get appropriate minimum value for EV efficiency unit
+        function getEvEfficiencyMinimum(unit) {
+            switch(unit) {
+                case 'mi/kWh': return 1;
+                case 'km/kWh': return 1.6;
+                case 'kWh/100mi': return 10;
+                case 'kWh/100km': return 6.2;
+                case 'Wh/mi': return 100;
+                case 'Wh/km': return 62;
+                case 'm/kJ': return 0.45;
+                case 'J/m': return 224;
+                default: return 0.1;
+            }
+        }
+
+        // Get appropriate maximum value for EV efficiency unit
+        function getEvEfficiencyMaximum(unit) {
+            switch(unit) {
+                case 'mi/kWh': return 10;
+                case 'km/kWh': return 16.1;
+                case 'kWh/100mi': return 100;
+                case 'kWh/100km': return 62.1;
+                case 'Wh/mi': return 1000;
+                case 'Wh/km': return 621;
+                case 'm/kJ': return 4.47;
+                case 'J/m': return 2237;
+                default: return 1000;
+            }
+        }
+
+        // Clamp value to appropriate range for unit
+        function clampEvEfficiency(value, unit) {
+            const min = getEvEfficiencyMinimum(unit);
+            const max = getEvEfficiencyMaximum(unit);
+            return Math.max(min, Math.min(max, value));
+        }
+
+        // Get appropriate decimal places for unit display
+        function getEvEfficiencyPrecision(unit) {
+            switch(unit) {
+                case 'm/kJ': return 3; // Small values need more precision
+                case 'J/m': return 0; // Large values don't need decimals
+                case 'Wh/mi':
+                case 'Wh/km': return 0; // Whole numbers for Wh
+                case 'kWh/100mi':
+                case 'kWh/100km': return 1; // One decimal for consumption units
+                default: return 1; // Default one decimal
+            }
+        }
+
+
 
         // Elements
         const elements = {
@@ -794,16 +846,13 @@
             petrolEfficiencyDisplay: document.getElementById('petrol-efficiency-display'),
             petrolCostDisplay: document.getElementById('petrol-cost-display'),
             evCostUnit: document.getElementById('ev-cost-unit'),
-            lockEvEfficiency: document.getElementById('lock-ev-efficiency'),
-            lockEvCost: document.getElementById('lock-ev-cost'),
-            lockPetrolEfficiency: document.getElementById('lock-petrol-efficiency'),
-            lockPetrolCost: document.getElementById('lock-petrol-cost'),
             chargingLossesCheckbox: document.getElementById('charging-losses-checkbox'),
             chargingLossesInput: document.getElementById('charging-losses-input'),
             equivalenceDisplay: document.getElementById('equivalence-display'),
             evEfficiencyUnit: document.getElementById('ev-efficiency-unit'),
             fuelEfficiencyUnit: document.getElementById('fuel-efficiency-unit'),
             fuelCostUnit: document.getElementById('fuel-cost-unit'),
+            fuelCostUnitDisplay: document.getElementById('fuel-cost-unit-display'),
             usageDistance: document.getElementById('usage-distance'),
             usageDistanceDisplay: document.getElementById('usage-distance-display'),
             usagePeriod: document.getElementById('usage-period'),
@@ -816,10 +865,13 @@
         function convertEvEfficiency(value, fromUnit, toUnit) {
             // Input validation
             if (isNaN(value) || value === null || value === undefined || value <= 0) {
-                return 0.1; // Return safe default
+                return getEvEfficiencyMinimum(toUnit); // Return unit-appropriate default
             }
             
             if (fromUnit === toUnit) return value;
+            
+            // Constants for joule conversions
+            const J_PER_KWH = 3600000; // 1 kWh = 3.6 MJ = 3,600,000 J
             
             // First convert to a standard unit (mi/kWh)
             let miPerKwh = value;
@@ -828,13 +880,28 @@
             if (fromUnit === 'km/kWh') {
                 miPerKwh = value * MILES_PER_KM;
             } else if (fromUnit === 'kWh/100mi') {
-                miPerKwh = value > 0 ? 100 / value : 0.1;
+                miPerKwh = value > 0 ? 100 / value : getEvEfficiencyMinimum('mi/kWh');
             } else if (fromUnit === 'kWh/100km') {
-                miPerKwh = value > 0 ? (100 / KM_PER_MILE) / value : 0.1;
+                miPerKwh = value > 0 ? (100 / KM_PER_MILE) / value : getEvEfficiencyMinimum('mi/kWh');
             } else if (fromUnit === 'Wh/mi') {
-                miPerKwh = value > 0 ? 1000 / value : 0.1;
+                miPerKwh = value > 0 ? 1000 / value : getEvEfficiencyMinimum('mi/kWh');
             } else if (fromUnit === 'Wh/km') {
-                miPerKwh = value > 0 ? (1000 / KM_PER_MILE) / value : 0.1;
+                // Wh/km to mi/kWh: (Wh/km) → (kWh/km) → (kWh/mi) → (mi/kWh)
+                // (Wh/km) * (kWh/1000Wh) * (km/mi) = kWh/mi, then invert
+                const kWhPerMile = (value / 1000) * KM_PER_MILE;
+                miPerKwh = value > 0 ? (1 / kWhPerMile) : getEvEfficiencyMinimum('mi/kWh');
+            } else if (fromUnit === 'm/kJ') {
+                // m/kJ to mi/kWh: (m/kJ) * (mi/m) * (kJ/kWh) = mi/kWh
+                // 1 mile = 1609.344 m, 1 kWh = 3600 kJ
+                const metersPerMile = KM_PER_MILE * 1000;
+                const kJPerKwh = J_PER_KWH / 1000;
+                miPerKwh = value * (1 / metersPerMile) * kJPerKwh;
+            } else if (fromUnit === 'J/m') {
+                // J/m to mi/kWh: (J/m) → (kWh/m) → (kWh/mi) → (mi/kWh)
+                // (J/m) * (kWh/J) * (m/mi) = kWh/mi, then invert for mi/kWh
+                const metersPerMile = KM_PER_MILE * 1000;
+                const kWhPerMile = value * (1 / J_PER_KWH) * metersPerMile;
+                miPerKwh = value > 0 ? (1 / kWhPerMile) : getEvEfficiencyMinimum('mi/kWh');
             } else if (fromUnit !== 'mi/kWh') {
                 miPerKwh = value; // Default fallback for unsupported units
             }
@@ -847,11 +914,22 @@
             } else if (toUnit === 'kWh/100mi') {
                 return miPerKwh > 0 ? 100 / miPerKwh : 100;
             } else if (toUnit === 'kWh/100km') {
-                return miPerKwh > 0 ? (100 * KM_PER_MILE) / miPerKwh : (100 * KM_PER_MILE);
+                return miPerKwh > 0 ? 100 / (miPerKwh * KM_PER_MILE) : 100 / KM_PER_MILE;
             } else if (toUnit === 'Wh/mi') {
                 return miPerKwh > 0 ? 1000 / miPerKwh : 1000;
             } else if (toUnit === 'Wh/km') {
-                return miPerKwh > 0 ? (1000 / miPerKwh) * KM_PER_MILE : (1000 * KM_PER_MILE);
+                // mi/kWh to Wh/km: (mi/kWh) → (kWh/mi) → (kWh/km) → (Wh/km)
+                // (1/mi/kWh) / (km/mi) * (1000Wh/kWh) = Wh/km
+                return miPerKwh > 0 ? (1 / miPerKwh) / KM_PER_MILE * 1000 : 1000 / KM_PER_MILE;
+            } else if (toUnit === 'm/kJ') {
+                // mi/kWh to m/kJ: (mi/kWh) * (m/mi) * (kWh/kJ) = m/kJ
+                const metersPerMile = KM_PER_MILE * 1000;
+                const kJPerKwh = J_PER_KWH / 1000;
+                return miPerKwh * metersPerMile / kJPerKwh;
+            } else if (toUnit === 'J/m') {
+                // mi/kWh to J/m: (mi/kWh) → (kWh/mi) → (J/mi) → (J/m)
+                const metersPerMile = KM_PER_MILE * 1000;
+                return miPerKwh > 0 ? (1 / miPerKwh) * J_PER_KWH / metersPerMile : J_PER_KWH / metersPerMile;
             }
             
             return miPerKwh;
@@ -905,6 +983,10 @@
                 return `${value.toFixed(0)} Wh/mi`;
             } else if (unit === 'Wh/km') {
                 return `${value.toFixed(0)} Wh/km`;
+            } else if (unit === 'm/kJ') {
+                return `${value.toFixed(1)} m/kJ`;
+            } else if (unit === 'J/m') {
+                return `${value.toFixed(0)} J/m`;
             }
             return `${value.toFixed(1)} ${unit}`; // Fallback for unknown units
         }
@@ -944,6 +1026,9 @@
         function convertEvCost(value, fromUnit, toUnit) {
             if (fromUnit === toUnit) return value;
             
+            // Constants
+            const MJ_PER_KWH = 3.6; // 1 kWh = 3.6 MJ
+            
             // Convert to standard unit (p/kWh) first
             let pPerKwh = value;
             
@@ -962,6 +1047,12 @@
                 pPerKwh = value * 1000;
             } else if (fromUnit === 'c/Wh') {
                 pPerKwh = value * 1000;
+            } else if (fromUnit === 'p/MJ') {
+                pPerKwh = value * MJ_PER_KWH; // Convert MJ to kWh
+            } else if (fromUnit === '¢/MJ') {
+                pPerKwh = value * MJ_PER_KWH;
+            } else if (fromUnit === 'c/MJ') {
+                pPerKwh = value * MJ_PER_KWH;
             }
             
             // To conversions from p/kWh
@@ -977,6 +1068,12 @@
                 return pPerKwh / 1000;
             } else if (toUnit === 'c/Wh') {
                 return pPerKwh / 1000;
+            } else if (toUnit === 'p/MJ') {
+                return pPerKwh / MJ_PER_KWH; // Convert kWh to MJ
+            } else if (toUnit === '¢/MJ') {
+                return pPerKwh / MJ_PER_KWH;
+            } else if (toUnit === 'c/MJ') {
+                return pPerKwh / MJ_PER_KWH;
             }
             
             return pPerKwh;
@@ -1112,7 +1209,9 @@
             const petrolCostPerMile = calculatePetrolCostPerMile();
             
             // Check if we need to convert to cost per km
-            const isMetric = state.evEfficiencyUnit.includes('km');
+            const isMetric = state.evEfficiencyUnit.includes('km') || 
+                           state.evEfficiencyUnit.includes('J/m') || 
+                           state.evEfficiencyUnit.includes('m/kJ');
             let evCostPerUnit = evCostPerMile;
             let petrolCostPerUnit = petrolCostPerMile;
             
@@ -1137,7 +1236,9 @@
 
         function updateUsageDisplay() {
             // Update distance unit based on EV efficiency unit
-            const isMetric = state.evEfficiencyUnit.includes('km');
+            const isMetric = state.evEfficiencyUnit.includes('km') || 
+                           state.evEfficiencyUnit.includes('J/m') || 
+                           state.evEfficiencyUnit.includes('m/kJ');
             const distanceUnit = isMetric ? 'km' : 'miles';
             elements.usageDistanceUnit.textContent = distanceUnit;
             
@@ -1160,7 +1261,8 @@
             
             // Only update input values if they're not currently focused (being edited)
             if (document.activeElement !== elements.evEfficiencyDisplay) {
-                elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(1);
+                const precision = getEvEfficiencyPrecision(state.evEfficiencyUnit);
+                elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(precision);
             }
             if (document.activeElement !== elements.evCostDisplay) {
                 elements.evCostDisplay.value = state.evCost.toFixed(1);
@@ -1180,20 +1282,19 @@
             
             // Update unit labels - no longer needed as unit is now in selector
             
-            // Update fuel cost unit display text
+            // Update fuel cost unit display text with currency
             const volumeUnit = state.fuelCostUnit;
-            let unitText = '';
-            if (volumeUnit === 'L') unitText = 'per litre';
-            else if (volumeUnit === 'galUS') unitText = 'per US gal';
-            else if (volumeUnit === 'galUK') unitText = 'per UK gal';
+            const currency = getEvCostCurrencySymbol(); // Use same currency as EV costs
+            elements.fuelCostUnitDisplay.textContent = `${currency} per`;
             elements.fuelCostUnit.value = volumeUnit;
             
             const costPerMile = calculateEvCostPerMile();
             const costPerKm = costPerMile * MILES_PER_KM;
             
             // Determine distance unit from EV efficiency unit
-            const isMetric = state.evEfficiencyUnit.includes('km');
-            const currency = getEvCostCurrencySymbol();
+            const isMetric = state.evEfficiencyUnit.includes('km') || 
+                           state.evEfficiencyUnit.includes('J/m') || 
+                           state.evEfficiencyUnit.includes('m/kJ');
             
             if (isMetric) {
                 elements.equivalenceDisplay.textContent = `Cost per km: ${(costPerKm * 100).toFixed(2)}${currency}`;
@@ -1207,37 +1308,40 @@
             isUpdating = false; // Reset flag
         }
 
-        // Update slider ranges based on units
+        // Update slider ranges based on units - using reasonable fixed ranges
         function updateSliderRanges() {
-            // EV efficiency ranges - all equivalent to 1-10 mi/kWh
+            // EV efficiency ranges based on realistic values
             if (state.evEfficiencyUnit === 'mi/kWh') {
                 elements.evEfficiency.min = 1;
                 elements.evEfficiency.max = 10;
                 elements.evEfficiency.step = 0.1;
             } else if (state.evEfficiencyUnit === 'km/kWh') {
-                // 1-10 mi/kWh = 1.61-16.1 km/kWh
                 elements.evEfficiency.min = 1.6;
                 elements.evEfficiency.max = 16.1;
                 elements.evEfficiency.step = 0.1;
             } else if (state.evEfficiencyUnit === 'kWh/100mi') {
-                // 1-10 mi/kWh = 100-10 kWh/100mi (inverted)
                 elements.evEfficiency.min = 10;
                 elements.evEfficiency.max = 100;
                 elements.evEfficiency.step = 0.5;
             } else if (state.evEfficiencyUnit === 'kWh/100km') {
-                // 1-10 mi/kWh = 160.9-16.1 kWh/100km (inverted, with km conversion)
-                elements.evEfficiency.min = 16.1;
-                elements.evEfficiency.max = 160.9;
-                elements.evEfficiency.step = 1;
+                elements.evEfficiency.min = 6.2;
+                elements.evEfficiency.max = 62.1;
+                elements.evEfficiency.step = 0.5;
             } else if (state.evEfficiencyUnit === 'Wh/mi') {
-                // 1-10 mi/kWh = 1000-100 Wh/mi (inverted, kWh to Wh)
                 elements.evEfficiency.min = 100;
                 elements.evEfficiency.max = 1000;
                 elements.evEfficiency.step = 10;
             } else if (state.evEfficiencyUnit === 'Wh/km') {
-                // 1-10 mi/kWh = 1609-161 Wh/km (inverted, with km/Wh conversion)
-                elements.evEfficiency.min = 161;
-                elements.evEfficiency.max = 1609;
+                elements.evEfficiency.min = 62;
+                elements.evEfficiency.max = 621;
+                elements.evEfficiency.step = 5;
+            } else if (state.evEfficiencyUnit === 'm/kJ') {
+                elements.evEfficiency.min = 0.45;
+                elements.evEfficiency.max = 4.47;
+                elements.evEfficiency.step = 0.01;
+            } else if (state.evEfficiencyUnit === 'J/m') {
+                elements.evEfficiency.min = 224;
+                elements.evEfficiency.max = 2237;
                 elements.evEfficiency.step = 10;
             }
             
@@ -1268,6 +1372,11 @@
                 elements.evCost.min = 0.01;
                 elements.evCost.max = 15;
                 elements.evCost.step = 0.01;
+            } else if (state.evCostUnit.includes('/MJ')) {
+                // MJ units - smaller values since 1 kWh = 3.6 MJ
+                elements.evCost.min = 0.1;
+                elements.evCost.max = 50;
+                elements.evCost.step = 0.1;
             } else {
                 elements.evCost.min = 0.1;
                 elements.evCost.max = 150;
@@ -1275,47 +1384,30 @@
             }
         }
 
-        // Maintain equivalence
+        // Maintain equivalence using virtual locking based on modification order
         function maintainEquivalence(changedParameter) {
-            const lockedCount = Object.values(locks).filter(l => l).length;
-            
-            if (lockedCount >= 3) return; // Can't maintain equivalence with 3+ locks
-            
             const evCostPerMile = calculateEvCostPerMile();
             const petrolCostPerMile = calculatePetrolCostPerMile();
             
-            // Find which parameters can be adjusted (not locked and not the one that changed)
-            const adjustableParams = [];
-            if (!locks.evEfficiency && changedParameter !== 'evEfficiency') adjustableParams.push('evEfficiency');
-            if (!locks.evCost && changedParameter !== 'evCost') adjustableParams.push('evCost');
-            if (!locks.petrolEfficiency && changedParameter !== 'petrolEfficiency') adjustableParams.push('petrolEfficiency');
-            if (!locks.petrolCost && changedParameter !== 'petrolCost') adjustableParams.push('petrolCost');
+            // Get all parameters except the one that just changed
+            const otherParams = ['evEfficiency', 'evCost', 'petrolEfficiency', 'petrolCost']
+                .filter(param => param !== changedParameter);
             
-            if (adjustableParams.length === 0) return; // Nothing to adjust
+            // Sort by last modified timestamp (oldest first)
+            otherParams.sort((a, b) => lastModified[a] - lastModified[b]);
             
-            // Strategy: Prefer to adjust the "opposite side" first, then fallback to same side
-            if (changedParameter === 'evEfficiency' || changedParameter === 'evCost') {
-                // EV side changed - try to adjust petrol side first
-                if (adjustableParams.includes('petrolEfficiency')) {
-                    adjustPetrolEfficiency(evCostPerMile);
-                } else if (adjustableParams.includes('petrolCost')) {
-                    adjustPetrolCost(evCostPerMile);
-                } else if (adjustableParams.includes('evEfficiency')) {
-                    adjustEvEfficiency(petrolCostPerMile);
-                } else if (adjustableParams.includes('evCost')) {
-                    adjustEvCost(petrolCostPerMile);
-                }
-            } else {
-                // Petrol side changed - try to adjust EV side first
-                if (adjustableParams.includes('evEfficiency')) {
-                    adjustEvEfficiency(petrolCostPerMile);
-                } else if (adjustableParams.includes('evCost')) {
-                    adjustEvCost(petrolCostPerMile);
-                } else if (adjustableParams.includes('petrolEfficiency')) {
-                    adjustPetrolEfficiency(evCostPerMile);
-                } else if (adjustableParams.includes('petrolCost')) {
-                    adjustPetrolCost(evCostPerMile);
-                }
+            // The oldest modified parameter is the one we'll adjust
+            const paramToAdjust = otherParams[0];
+            
+            // Adjust the oldest parameter to maintain equivalence
+            if (paramToAdjust === 'evEfficiency') {
+                adjustEvEfficiency(petrolCostPerMile);
+            } else if (paramToAdjust === 'evCost') {
+                adjustEvCost(petrolCostPerMile);
+            } else if (paramToAdjust === 'petrolEfficiency') {
+                adjustPetrolEfficiency(evCostPerMile);
+            } else if (paramToAdjust === 'petrolCost') {
+                adjustPetrolCost(evCostPerMile);
             }
         }
         
@@ -1357,7 +1449,7 @@
                 targetEfficiency /= (1 + state.chargingLosses / 100);
             }
             targetEfficiency = convertEvEfficiency(targetEfficiency, 'mi/kWh', state.evEfficiencyUnit);
-            state.evEfficiency = Math.max(0.1, targetEfficiency);
+            state.evEfficiency = clampEvEfficiency(targetEfficiency, state.evEfficiencyUnit);
             elements.evEfficiency.value = state.evEfficiency;
         }
         
@@ -1378,6 +1470,7 @@
         elements.evEfficiency.addEventListener('input', (e) => {
             if (isUpdating) return;
             state.evEfficiency = parseFloat(e.target.value);
+            updateLastModified('evEfficiency');
             maintainEquivalence('evEfficiency');
             updateDisplays();
         });
@@ -1385,6 +1478,7 @@
         elements.evCost.addEventListener('input', (e) => {
             if (isUpdating) return;
             state.evCost = parseFloat(e.target.value);
+            updateLastModified('evCost');
             maintainEquivalence('evCost');
             updateDisplays();
         });
@@ -1392,6 +1486,7 @@
         elements.petrolEfficiency.addEventListener('input', (e) => {
             if (isUpdating) return;
             state.petrolEfficiency = parseFloat(e.target.value);
+            updateLastModified('petrolEfficiency');
             maintainEquivalence('petrolEfficiency');
             updateDisplays();
         });
@@ -1399,6 +1494,7 @@
         elements.petrolCost.addEventListener('input', (e) => {
             if (isUpdating) return;
             state.petrolCost = parseFloat(e.target.value);
+            updateLastModified('petrolCost');
             maintainEquivalence('petrolCost');
             updateDisplays();
         });
@@ -1409,6 +1505,7 @@
             if (!isNaN(value) && value > 0) {
                 state.evEfficiency = value;
                 elements.evEfficiency.value = value;
+                updateLastModified('evEfficiency');
                 maintainEquivalence('evEfficiency');
                 updateDisplays();
             } else {
@@ -1422,6 +1519,7 @@
             if (!isNaN(value) && value > 0) {
                 state.evCost = value;
                 elements.evCost.value = value;
+                updateLastModified('evCost');
                 maintainEquivalence('evCost');
                 updateDisplays();
             } else {
@@ -1435,6 +1533,7 @@
             if (!isNaN(value) && value > 0) {
                 state.petrolEfficiency = value;
                 elements.petrolEfficiency.value = value;
+                updateLastModified('petrolEfficiency');
                 maintainEquivalence('petrolEfficiency');
                 updateDisplays();
             } else {
@@ -1448,6 +1547,7 @@
             if (!isNaN(value) && value > 0) {
                 state.petrolCost = value;
                 elements.petrolCost.value = value;
+                updateLastModified('petrolCost');
                 maintainEquivalence('petrolCost');
                 updateDisplays();
             } else {
@@ -1456,47 +1556,6 @@
             }
         });
 
-        // Lock checkboxes
-        elements.lockEvEfficiency.addEventListener('change', (e) => {
-            locks.evEfficiency = e.target.checked;
-            checkLockLimit();
-        });
-
-        elements.lockEvCost.addEventListener('change', (e) => {
-            locks.evCost = e.target.checked;
-            checkLockLimit();
-        });
-
-        elements.lockPetrolEfficiency.addEventListener('change', (e) => {
-            locks.petrolEfficiency = e.target.checked;
-            checkLockLimit();
-        });
-
-        elements.lockPetrolCost.addEventListener('change', (e) => {
-            locks.petrolCost = e.target.checked;
-            checkLockLimit();
-        });
-
-        // Prevent more than 2 locks
-        function checkLockLimit() {
-            // Use a timeout to prevent race conditions from simultaneous checkbox changes
-            setTimeout(() => {
-                const lockedCount = Object.values(locks).filter(l => l).length;
-                if (lockedCount >= 2) {
-                    // Disable unchecked checkboxes
-                    if (!locks.evEfficiency) elements.lockEvEfficiency.disabled = true;
-                    if (!locks.evCost) elements.lockEvCost.disabled = true;
-                    if (!locks.petrolEfficiency) elements.lockPetrolEfficiency.disabled = true;
-                    if (!locks.petrolCost) elements.lockPetrolCost.disabled = true;
-                } else {
-                    // Enable all checkboxes
-                    elements.lockEvEfficiency.disabled = false;
-                    elements.lockEvCost.disabled = false;
-                    elements.lockPetrolEfficiency.disabled = false;
-                    elements.lockPetrolCost.disabled = false;
-                }
-            }, 0);
-        }
 
         // Charging losses
         elements.chargingLossesCheckbox.addEventListener('change', (e) => {
@@ -1517,12 +1576,14 @@
             const oldUnit = state.evEfficiencyUnit;
             const newUnit = e.target.value;
             
-            // Convert the current value to the new unit
+            // Convert using mathematical equivalence to maintain cost equivalence
             state.evEfficiency = convertEvEfficiency(state.evEfficiency, oldUnit, newUnit);
             state.evEfficiencyUnit = newUnit;
             
             // Auto-update fuel efficiency to match distance base
-            const isMetric = newUnit.includes('km');
+            const isMetric = newUnit.includes('km') || 
+                           newUnit.includes('J/m') || 
+                           newUnit.includes('m/kJ');
             const currentFuelIsMetric = state.fuelEfficiencyUnit.includes('km') || state.fuelEfficiencyUnit.includes('L');
             
             if (isMetric && !currentFuelIsMetric) {
@@ -1654,6 +1715,7 @@
             state.outputPeriod = e.target.value;
             updateUsageDisplay();
         });
+
 
         // Initialize
         updateSliderRanges();
