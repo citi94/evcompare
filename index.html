@@ -666,9 +666,9 @@
                         <div class="value-container">
                             <input type="number" class="value-display" id="petrol-cost-display" value="133.9" step="0.1" min="0.1">
                             <select id="fuel-cost-unit" class="unit-select">
-                                <option value="L">per Litre</option>
-                                <option value="galUS">per US Gal</option>
-                                <option value="galUK">per UK Gal</option>
+                                <option value="L">per litre</option>
+                                <option value="galUS">per US gal</option>
+                                <option value="galUK">per UK gal</option>
                             </select>
                         </div>
                     </div>
@@ -1183,9 +1183,9 @@
             // Update fuel cost unit display text
             const volumeUnit = state.fuelCostUnit;
             let unitText = '';
-            if (volumeUnit === 'L') unitText = 'per Litre';
-            else if (volumeUnit === 'galUS') unitText = 'per US Gal';
-            else if (volumeUnit === 'galUK') unitText = 'per UK Gal';
+            if (volumeUnit === 'L') unitText = 'per litre';
+            else if (volumeUnit === 'galUS') unitText = 'per US gal';
+            else if (volumeUnit === 'galUK') unitText = 'per UK gal';
             elements.fuelCostUnit.value = volumeUnit;
             
             const costPerMile = calculateEvCostPerMile();
