@@ -164,6 +164,46 @@
             height: 20px;
             cursor: pointer;
             accent-color: #3498db;
+            position: relative;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 2px;
+        }
+
+        .lock-checkbox:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lock-checkbox::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: #f8f9fa;
+            border-radius: 2px;
+        }
+
+        .lock-checkbox:checked {
+            background: transparent;
+            border: none;
+        }
+
+        .lock-checkbox:checked::after {
+            content: '🔒';
+            opacity: 1;
         }
 
         .petrol-section .lock-checkbox {
@@ -319,9 +359,19 @@
             font-weight: 500;
         }
 
-        .copyright {
+        .lock-explanation {
             text-align: center;
             margin-top: 20px;
+            padding: 10px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 15px;
             padding: 15px;
             color: #7f8c8d;
             font-size: 0.9em;
@@ -443,6 +493,15 @@
 
         <div class="equivalence-display" id="equivalence-display">
             Cost per mile: 0.00p
+        </div>
+
+        <div class="lock-explanation">
+            <div style="margin-bottom: 10px;">Tick up to two checkboxes to lock parameters while adjusting others:</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 1.2em;">
+                <span>☐ Unlocked</span>
+                <span>→</span>
+                <span>🔒 Locked</span>
+            </div>
         </div>
 
         <div class="copyright">
