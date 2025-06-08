@@ -554,8 +554,8 @@
 
         @media (max-width: 768px) {
             .usage-input-group, .usage-output-group {
-                flex-direction: column;
                 gap: 8px;
+                flex-wrap: wrap;
             }
             
             .usage-inputs {
@@ -570,10 +570,11 @@
             
             .value-container {
                 display: grid;
-                grid-template-columns: auto auto 1fr;
+                grid-template-columns: auto auto auto;
                 gap: 8px;
                 align-items: center;
-                width: 100%;
+                width: auto;
+                justify-content: start;
             }
             
             .value-display {
@@ -587,8 +588,9 @@
             }
             
             .usage-select {
-                min-width: 0;
-                flex-shrink: 1;
+                width: auto;
+                min-width: 80px;
+                max-width: 120px;
             }
         }
 
@@ -708,7 +710,6 @@
             
             .cost-separator {
                 font-size: 1.2em;
-                transform: rotate(90deg);
             }
             
             .mode-toggle-btn {
