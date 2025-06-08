@@ -8,6 +8,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EV vs ICE Cost Calculator</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Compare fuel costs between Electric Vehicles and Internal Combustion Engine vehicles">
+    <meta name="theme-color" content="#3498db">
+    <meta name="msapplication-TileColor" content="#3498db">
+    <meta name="msapplication-navbutton-color" content="#3498db">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EV Compare">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%232ecc71'/%3E%3Cstop offset='100%25' style='stop-color:%233498db'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' rx='24' fill='url(%23grad)'/%3E%3Ctext x='96' y='80' text-anchor='middle' fill='white' font-size='48' font-weight='bold'%3E⚡%3C/text%3E%3Ctext x='96' y='130' text-anchor='middle' fill='white' font-size='24' font-weight='bold'%3Evs%3C/text%3E%3Ctext x='96' y='165' text-anchor='middle' fill='white' font-size='32' font-weight='bold'%3E⛽%3C/text%3E%3C/svg%3E">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%232ecc71'/%3E%3Cstop offset='100%25' style='stop-color:%233498db'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='4' fill='url(%23grad)'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold'%3E⚡%3C/text%3E%3C/svg%3E">
     <style>
         * {
             margin: 0;
@@ -58,6 +77,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-bottom: 30px;
+            position: relative;
         }
 
         .section {
@@ -298,14 +318,14 @@
         }
 
         .equivalence-display {
-            background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+            background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
             color: white;
             padding: 20px;
             border-radius: 15px;
             text-align: center;
             font-size: 1.2em;
             font-weight: 600;
-            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
             margin-top: 30px;
         }
 
@@ -456,7 +476,7 @@
 
         .usage-calculator {
             background: #f8f9fa;
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
             margin: 30px 0;
             transition: all 0.3s ease;
@@ -479,7 +499,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 0;
         }
 
         .usage-input-group, .usage-output-group {
@@ -580,6 +600,140 @@
             font-size: 0.9em;
             border-top: 1px solid #ecf0f1;
         }
+
+        /* Mode toggle button styles */
+        .mode-toggle-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 40px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            width: fit-content;
+            height: fit-content;
+            margin: 0;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(180deg);
+            z-index: 10;
+        }
+
+        .mode-toggle-btn:hover {
+            transform: translate(-50%, -50%) rotate(180deg) scale(1.05);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .mode-toggle-btn:active {
+            transform: translate(-50%, -50%) rotate(180deg) scale(0.95);
+        }
+
+        .mode-toggle-btn.comparison-mode {
+            background: linear-gradient(135deg, #e74c3c 0%, #f39c12 100%);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .mode-toggle-btn.comparison-mode:hover {
+            transform: translate(-50%, -50%) rotate(180deg) scale(1.05);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+
+        /* Split display styles */
+        .cost-split {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .cost-ev, .cost-ice {
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .cost-ev {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .cost-ice {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .cost-separator {
+            font-size: 1.5em;
+            color: white;
+            font-weight: bold;
+        }
+
+        .savings-display {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
+            margin-top: 20px;
+        }
+
+        .savings-display.ice-cheaper {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Mobile responsive adjustments for split displays */
+        @media (max-width: 480px) {
+            .cost-split {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .cost-separator {
+                font-size: 1.2em;
+                transform: rotate(90deg);
+            }
+            
+            .mode-toggle-btn {
+                padding: 30px 10px;
+                font-size: 0.75em;
+                position: relative;
+                left: auto;
+                top: auto;
+                transform: none;
+                writing-mode: horizontal-tb;
+                text-orientation: initial;
+                margin: 15px auto;
+                display: block;
+            }
+            
+            .mode-toggle-btn:hover {
+                transform: scale(1.05);
+            }
+            
+            .mode-toggle-btn.comparison-mode:hover {
+                transform: scale(1.05);
+            }
+            
+            .savings-display {
+                padding: 15px;
+                font-size: 1.1em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -638,7 +792,20 @@
                         <input type="range" id="ev-cost" min="0" max="150" step="0.1" value="55">
                     </div>
                 </div>
+
+                <div class="option-group">
+                    <label class="option-label">
+                        <input type="checkbox" id="charging-losses-checkbox">
+                        <span>Include charging losses</span>
+                    </label>
+                    <input type="number" id="charging-losses-input" class="efficiency-input" value="10" min="0" max="50" step="0.1" disabled>
+                    <span>%</span>
+                </div>
             </div>
+
+            <button id="mode-toggle" class="mode-toggle-btn">
+                <span id="mode-toggle-text">Unlock & Compare</span>
+            </button>
 
             <div class="section petrol-section">
                 <h2 class="section-title">
@@ -681,17 +848,6 @@
                         <input type="range" id="petrol-cost" min="0" max="200" step="0.1" value="133.9">
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="options-section">
-            <div class="option-group">
-                <label class="option-label">
-                    <input type="checkbox" id="charging-losses-checkbox">
-                    <span>Include charging losses</span>
-                </label>
-                <input type="number" id="charging-losses-input" class="efficiency-input" value="10" min="0" max="50" step="0.1" disabled>
-                <span>%</span>
             </div>
         </div>
 
@@ -754,6 +910,7 @@
         
         // State
         let state = {
+            mode: 'equivalence', // 'equivalence' or 'comparison'
             evEfficiency: 4.0,
             evCost: 55.0,
             petrolEfficiency: 44.0,
@@ -884,7 +1041,9 @@
             usagePeriod: document.getElementById('usage-period'),
             outputPeriod: document.getElementById('output-period'),
             usageDistanceUnit: document.getElementById('usage-distance-unit'),
-            usageCostValue: document.getElementById('usage-cost-value')
+            usageCostValue: document.getElementById('usage-cost-value'),
+            modeToggle: document.getElementById('mode-toggle'),
+            modeToggleText: document.getElementById('mode-toggle-text')
         };
 
         // Unit conversion functions
@@ -1314,16 +1473,119 @@
             const distanceUnit = isMetric ? 'km' : 'miles';
             elements.usageDistanceUnit.textContent = distanceUnit;
             
-            // Calculate cost (use EV cost as they should be equal due to equivalence)
+            // Calculate costs
             const costs = calculateUsageCosts();
             const currency = getMainCurrencySymbol();
-            
-            // Format cost in main currency (pounds, dollars, euros)
-            const cost = `${currency}${costs.evCost.toFixed(2)}`;
             const periodText = state.outputPeriod;
             
-            // Update display
-            elements.usageCostValue.textContent = `${cost} per ${periodText}`;
+            if (state.mode === 'equivalence') {
+                // Hide the entire usage results container in the grey box
+                const usageResults = document.querySelector('.usage-results');
+                if (usageResults) {
+                    usageResults.style.display = 'none';
+                }
+                
+                // Show single cost in separate container (like per-distance)
+                const usageSavingsContainer = document.getElementById('usage-savings-container') || createUsageSavingsContainer();
+                const cost = `${currency}${costs.evCost.toFixed(2)}`;
+                
+                usageSavingsContainer.className = 'equivalence-display';
+                usageSavingsContainer.innerHTML = `Cost per ${periodText}: ${cost}`;
+                usageSavingsContainer.style.display = 'block';
+                
+                // Hide savings-only container in equivalence mode
+                const savingsOnlyContainer = document.getElementById('usage-savings-only-container');
+                if (savingsOnlyContainer) {
+                    savingsOnlyContainer.style.display = 'none';
+                }
+            } else {
+                // Hide the usage results container in comparison mode too
+                const usageResults = document.querySelector('.usage-results');
+                if (usageResults) {
+                    usageResults.style.display = 'none';
+                }
+                
+                // Show split costs in separate container (outside grey box)
+                const evCost = `${currency}${costs.evCost.toFixed(2)}`;
+                const petrolCost = `${currency}${costs.petrolCost.toFixed(2)}`;
+                const savings = costs.savings;
+                
+                const usageSavingsContainer = document.getElementById('usage-savings-container') || createUsageSavingsContainer();
+                
+                // Show split cost display outside the grey box
+                usageSavingsContainer.className = 'equivalence-display';
+                usageSavingsContainer.innerHTML = `
+                    <div class="cost-split">
+                        <div class="cost-ev">
+                            EV: ${evCost}<br>
+                            <small>per ${periodText}</small>
+                        </div>
+                        <div class="cost-separator">vs</div>
+                        <div class="cost-ice">
+                            ICE: ${petrolCost}<br>
+                            <small>per ${periodText}</small>
+                        </div>
+                    </div>
+                `;
+                usageSavingsContainer.style.display = 'block';
+                
+                // Add separate savings display if there's a difference
+                if (Math.abs(savings) > 0.01) {
+                    const isEvCheaper = savings > 0;
+                    const savingsAmount = Math.abs(savings).toFixed(2);
+                    
+                    // Create a second container for savings
+                    let savingsOnlyContainer = document.getElementById('usage-savings-only-container');
+                    if (!savingsOnlyContainer) {
+                        savingsOnlyContainer = document.createElement('div');
+                        savingsOnlyContainer.id = 'usage-savings-only-container';
+                        usageSavingsContainer.parentNode.insertBefore(savingsOnlyContainer, usageSavingsContainer.nextSibling);
+                    }
+                    
+                    savingsOnlyContainer.className = isEvCheaper ? 'savings-display' : 'savings-display ice-cheaper';
+                    savingsOnlyContainer.innerHTML = isEvCheaper 
+                        ? `EVs save ${currency}${savingsAmount} per ${periodText} compared to ICE vehicles`
+                        : `EVs cost ${currency}${savingsAmount} more per ${periodText} than ICE vehicles`;
+                    savingsOnlyContainer.style.display = 'block';
+                } else {
+                    // Hide savings-only container when costs are identical
+                    const savingsOnlyContainer = document.getElementById('usage-savings-only-container');
+                    if (savingsOnlyContainer) {
+                        savingsOnlyContainer.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // Create usage savings container if it doesn't exist
+        function createUsageSavingsContainer() {
+            let container = document.getElementById('usage-savings-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'usage-savings-container';
+                container.className = 'savings-display';
+                // Insert after the entire usage calculator container, not inside it
+                const usageCalculator = document.querySelector('.usage-calculator');
+                usageCalculator.parentNode.insertBefore(container, usageCalculator.nextSibling);
+            }
+            return container;
+        }
+
+        // Toggle between equivalence and comparison modes
+        function toggleMode() {
+            state.mode = state.mode === 'equivalence' ? 'comparison' : 'equivalence';
+            
+            // Update button appearance and text
+            if (state.mode === 'comparison') {
+                elements.modeToggle.classList.add('comparison-mode');
+                elements.modeToggleText.textContent = 'Lock to Equivalence';
+            } else {
+                elements.modeToggle.classList.remove('comparison-mode');
+                elements.modeToggleText.textContent = 'Unlock & Compare';
+            }
+            
+            // Update displays
+            updateDisplays();
         }
 
         // Update displays with better race condition handling
@@ -1361,24 +1623,87 @@
                 elements.fuelCostUnitDisplay.textContent = `${currency} per`;
                 elements.fuelCostUnit.value = volumeUnit;
                 
-                // Calculate and display cost equivalence
-                const costPerMile = calculateEvCostPerMile();
-                const costPerKm = costPerMile * MILES_PER_KM;
-                
-                // Determine distance unit from EV efficiency unit
-                const isMetric = state.evEfficiencyUnit.includes('km') || 
-                               state.evEfficiencyUnit.includes('J/m') || 
-                               state.evEfficiencyUnit.includes('m/kJ');
-                
-                if (isMetric) {
-                    elements.equivalenceDisplay.textContent = `Cost per km: ${(costPerKm * 100).toFixed(2)}${currency}`;
-                } else {
-                    elements.equivalenceDisplay.textContent = `Cost per mile: ${(costPerMile * 100).toFixed(2)}${currency}`;
-                }
+                // Update main cost display based on mode
+                updateCostDisplay();
                 
                 // Update usage calculator display
                 updateUsageDisplay();
             });
+        }
+
+        // Update cost display based on current mode
+        function updateCostDisplay() {
+            const evCostPerMile = calculateEvCostPerMile();
+            const petrolCostPerMile = calculatePetrolCostPerMile();
+            const currency = getEvCostCurrencySymbol();
+            
+            // Determine distance unit from EV efficiency unit
+            const isMetric = state.evEfficiencyUnit.includes('km') || 
+                           state.evEfficiencyUnit.includes('J/m') || 
+                           state.evEfficiencyUnit.includes('m/kJ');
+            
+            const distanceUnit = isMetric ? 'km' : 'mile';
+            const evCostPerUnit = isMetric ? evCostPerMile * MILES_PER_KM : evCostPerMile;
+            const petrolCostPerUnit = isMetric ? petrolCostPerMile * MILES_PER_KM : petrolCostPerMile;
+            
+            if (state.mode === 'equivalence') {
+                // Show single unified cost
+                elements.equivalenceDisplay.innerHTML = `Cost per ${distanceUnit}: ${(evCostPerUnit * 100).toFixed(2)}${currency}`;
+                
+                // Hide savings container in equivalence mode
+                const savingsContainer = document.getElementById('savings-container');
+                if (savingsContainer) {
+                    savingsContainer.style.display = 'none';
+                }
+            } else {
+                // Show split comparison
+                const evCost = (evCostPerUnit * 100).toFixed(2);
+                const petrolCost = (petrolCostPerUnit * 100).toFixed(2);
+                
+                elements.equivalenceDisplay.innerHTML = `
+                    <div class="cost-split">
+                        <div class="cost-ev">
+                            EV: ${evCost}${currency}<br>
+                            <small>per ${distanceUnit}</small>
+                        </div>
+                        <div class="cost-separator">vs</div>
+                        <div class="cost-ice">
+                            ICE: ${petrolCost}${currency}<br>
+                            <small>per ${distanceUnit}</small>
+                        </div>
+                    </div>
+                `;
+                
+                // Add savings display
+                const difference = petrolCostPerUnit - evCostPerUnit;
+                const savingsContainer = document.getElementById('savings-container') || createSavingsContainer();
+                
+                if (Math.abs(difference) > 0.0001) {
+                    const isEvCheaper = difference > 0;
+                    const savingsAmount = Math.abs(difference * 100).toFixed(2);
+                    
+                    savingsContainer.className = isEvCheaper ? 'savings-display' : 'savings-display ice-cheaper';
+                    savingsContainer.innerHTML = isEvCheaper 
+                        ? `EVs save ${savingsAmount}${currency} per ${distanceUnit} compared to ICE vehicles`
+                        : `EVs cost ${savingsAmount}${currency} more per ${distanceUnit} than ICE vehicles`;
+                    savingsContainer.style.display = 'block';
+                } else {
+                    // Hide savings container when costs are identical
+                    savingsContainer.style.display = 'none';
+                }
+            }
+        }
+
+        // Create savings container if it doesn't exist
+        function createSavingsContainer() {
+            let container = document.getElementById('savings-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'savings-container';
+                container.className = 'savings-display';
+                elements.equivalenceDisplay.parentNode.insertBefore(container, elements.equivalenceDisplay.nextSibling);
+            }
+            return container;
         }
 
         // Update slider ranges based on units - realistic efficiency values
@@ -1460,6 +1785,9 @@
 
         // Maintain equivalence using virtual locking based on modification order
         function maintainEquivalence(changedParameter) {
+            // Only maintain equivalence in equivalence mode
+            if (state.mode !== 'equivalence') return;
+            
             // Prevent recursive calls and race conditions
             if (isUpdating) return;
             
@@ -1818,11 +2146,61 @@
             updateUsageDisplay();
         });
 
+        // Mode toggle event listener
+        elements.modeToggle.addEventListener('click', () => {
+            toggleMode();
+        });
 
         // Initialize
         updateSliderRanges();
         updateUsageSliderRange();
         updateDisplays();
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register Service Worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    console.log('New version available! Please refresh.');
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+
+            // Listen for installation prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Stash the event so it can be triggered later
+                deferredPrompt = e;
+                console.log('PWA install prompt available');
+                
+                // Optionally show install button/banner here
+                // You could create a "Install App" button that calls deferredPrompt.prompt()
+            });
+
+            // Track when PWA is installed
+            window.addEventListener('appinstalled', () => {
+                console.log('PWA was installed successfully');
+                deferredPrompt = null;
+            });
+        }
     </script>
 </body>
 </html>
