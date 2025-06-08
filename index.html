@@ -635,7 +635,7 @@
                         </div>
                     </div>
                     <div class="slider-container">
-                        <input type="range" id="ev-cost" min="0.1" max="150" step="0.1" value="55">
+                        <input type="range" id="ev-cost" min="0" max="150" step="0.1" value="55">
                     </div>
                 </div>
             </div>
@@ -678,7 +678,7 @@
                         </div>
                     </div>
                     <div class="slider-container">
-                        <input type="range" id="petrol-cost" min="10" max="200" step="0.1" value="133.9">
+                        <input type="range" id="petrol-cost" min="0" max="200" step="0.1" value="133.9">
                     </div>
                 </div>
             </div>
@@ -1310,80 +1310,81 @@
             isUpdating = false; // Reset flag
         }
 
-        // Update slider ranges based on units - using reasonable fixed ranges
+        // Update slider ranges based on units - aligned for rounder numbers
         function updateSliderRanges() {
-            // EV efficiency ranges based on realistic values
+            // EV efficiency ranges based on realistic values - aligned to hit round numbers
             if (state.evEfficiencyUnit === 'mi/kWh') {
-                elements.evEfficiency.min = 1;
-                elements.evEfficiency.max = 10;
+                elements.evEfficiency.min = 1.0;
+                elements.evEfficiency.max = 10.0;
                 elements.evEfficiency.step = 0.1;
             } else if (state.evEfficiencyUnit === 'km/kWh') {
-                elements.evEfficiency.min = 1.6;
-                elements.evEfficiency.max = 16.1;
+                elements.evEfficiency.min = 1.6; // Keeps same functional range
+                elements.evEfficiency.max = 16.0; // Rounds to 16.0
                 elements.evEfficiency.step = 0.1;
             } else if (state.evEfficiencyUnit === 'kWh/100mi') {
-                elements.evEfficiency.min = 10;
-                elements.evEfficiency.max = 100;
+                elements.evEfficiency.min = 10.0;
+                elements.evEfficiency.max = 100.0;
                 elements.evEfficiency.step = 0.5;
             } else if (state.evEfficiencyUnit === 'kWh/100km') {
-                elements.evEfficiency.min = 6.2;
-                elements.evEfficiency.max = 62.1;
+                elements.evEfficiency.min = 6.0; // Round down from 6.2
+                elements.evEfficiency.max = 62.0; // Round down from 62.1
                 elements.evEfficiency.step = 0.5;
             } else if (state.evEfficiencyUnit === 'Wh/mi') {
                 elements.evEfficiency.min = 100;
                 elements.evEfficiency.max = 1000;
                 elements.evEfficiency.step = 10;
             } else if (state.evEfficiencyUnit === 'Wh/km') {
-                elements.evEfficiency.min = 62;
-                elements.evEfficiency.max = 621;
+                elements.evEfficiency.min = 60; // Round from 62
+                elements.evEfficiency.max = 620; // Round from 621
                 elements.evEfficiency.step = 5;
             } else if (state.evEfficiencyUnit === 'm/kJ') {
-                elements.evEfficiency.min = 0.45;
-                elements.evEfficiency.max = 4.47;
+                elements.evEfficiency.min = 0.4; // Round from 0.45 for cleaner steps
+                elements.evEfficiency.max = 4.5; // Round from 4.47
                 elements.evEfficiency.step = 0.01;
             } else if (state.evEfficiencyUnit === 'J/m') {
-                elements.evEfficiency.min = 224;
-                elements.evEfficiency.max = 2237;
+                elements.evEfficiency.min = 220; // Round from 224
+                elements.evEfficiency.max = 2240; // Round from 2237
                 elements.evEfficiency.step = 10;
             }
             
-            // Fuel efficiency ranges - all equivalent to 10-80 mpgUK (realistic car range)
+            // Fuel efficiency ranges - aligned for round numbers
             if (state.fuelEfficiencyUnit === 'mpgUK') {
-                elements.petrolEfficiency.min = 10;
-                elements.petrolEfficiency.max = 80;
-                elements.petrolEfficiency.step = 0.5;
+                elements.petrolEfficiency.min = 10.0;
+                elements.petrolEfficiency.max = 80.0;
+                elements.petrolEfficiency.step = 0.5; // Gives 10.0, 10.5, 11.0, etc.
             } else if (state.fuelEfficiencyUnit === 'mpgUS') {
-                // 10-80 mpgUK = 8.3-66.6 mpgUS
-                elements.petrolEfficiency.min = 8.3;
-                elements.petrolEfficiency.max = 66.6;
+                elements.petrolEfficiency.min = 8.0; // Round from 8.3
+                elements.petrolEfficiency.max = 67.0; // Round from 66.6
                 elements.petrolEfficiency.step = 0.5;
             } else if (state.fuelEfficiencyUnit === 'km/L') {
-                // 10-80 mpgUK = 3.5-28.2 km/L
-                elements.petrolEfficiency.min = 3.5;
-                elements.petrolEfficiency.max = 28.2;
+                elements.petrolEfficiency.min = 3.0; // Round from 3.5 for cleaner start
+                elements.petrolEfficiency.max = 28.0; // Round from 28.2
                 elements.petrolEfficiency.step = 0.1;
             } else if (state.fuelEfficiencyUnit === 'L/100km') {
-                // 10-80 mpgUK = 28.2-3.5 L/100km (inverted)
-                elements.petrolEfficiency.min = 3.5;
-                elements.petrolEfficiency.max = 28.2;
+                elements.petrolEfficiency.min = 3.0; // Round from 3.5
+                elements.petrolEfficiency.max = 28.0; // Round from 28.2
                 elements.petrolEfficiency.step = 0.1;
             }
             
-            // Energy cost ranges
+            // Energy cost ranges - aligned for round currency amounts
             if (state.evCostUnit.includes('/Wh')) {
                 elements.evCost.min = 0.01;
-                elements.evCost.max = 15;
+                elements.evCost.max = 15.0; // Round max
                 elements.evCost.step = 0.01;
             } else if (state.evCostUnit.includes('/MJ')) {
-                // MJ units - smaller values since 1 kWh = 3.6 MJ
                 elements.evCost.min = 0.1;
-                elements.evCost.max = 50;
+                elements.evCost.max = 50.0; // Round max
                 elements.evCost.step = 0.1;
             } else {
-                elements.evCost.min = 0.1;
-                elements.evCost.max = 150;
+                elements.evCost.min = 0.0; // Start at 0 for round increments
+                elements.evCost.max = 150.0;
                 elements.evCost.step = 0.1;
             }
+            
+            // Petrol cost range - aligned for round currency amounts
+            elements.petrolCost.min = 0.0; // Start at 0 for round increments
+            elements.petrolCost.max = 200.0;
+            elements.petrolCost.step = 0.1; // Gives 0.0, 0.1, 0.2... cleaner than 10.0, 10.1, 10.2
         }
 
         // Maintain equivalence using virtual locking based on modification order
