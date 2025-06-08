@@ -689,6 +689,9 @@
             font-weight: 600;
             box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
             margin-top: 20px;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .savings-display.ice-cheaper {
@@ -1564,9 +1567,12 @@
                 container = document.createElement('div');
                 container.id = 'usage-savings-container';
                 container.className = 'savings-display';
+                container.style.display = 'block'; // Explicitly set display
+                container.style.visibility = 'visible'; // Ensure visibility
                 // Insert after the entire usage calculator container, not inside it
                 const usageCalculator = document.querySelector('.usage-calculator');
                 usageCalculator.parentNode.insertBefore(container, usageCalculator.nextSibling);
+                console.log('Created usage savings container:', container); // Debug log
             }
             return container;
         }
@@ -1701,7 +1707,10 @@
                 container = document.createElement('div');
                 container.id = 'savings-container';
                 container.className = 'savings-display';
+                container.style.display = 'block'; // Explicitly set display
+                container.style.visibility = 'visible'; // Ensure visibility
                 elements.equivalenceDisplay.parentNode.insertBefore(container, elements.equivalenceDisplay.nextSibling);
+                console.log('Created savings container:', container); // Debug log
             }
             return container;
         }
