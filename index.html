@@ -779,23 +779,47 @@
         };
 
         let isUpdating = false; // Prevent circular updates
+        let updateQueue = []; // Queue for delayed updates to prevent race conditions
 
         // Function to update last modified timestamp for a parameter
         function updateLastModified(parameter) {
             lastModified[parameter] = Date.now();
         }
 
+        // Debounced update function to prevent race conditions
+        function scheduleUpdate(callback, delay = 10) {
+            updateQueue.push(callback);
+            
+            // Only start the update cycle if it's not already running
+            if (updateQueue.length === 1) {
+                setTimeout(() => {
+                    if (isUpdating) return; // Skip if already updating
+                    
+                    // Process all queued updates
+                    const updates = [...updateQueue];
+                    updateQueue.length = 0; // Clear queue
+                    
+                    isUpdating = true;
+                    try {
+                        updates.forEach(update => update());
+                    } finally {
+                        isUpdating = false;
+                    }
+                }, delay);
+            }
+        }
+
         // Get appropriate minimum value for EV efficiency unit
         function getEvEfficiencyMinimum(unit) {
             switch(unit) {
-                case 'mi/kWh': return 1;
-                case 'km/kWh': return 1.6;
-                case 'kWh/100mi': return 10;
-                case 'kWh/100km': return 6.2;
-                case 'Wh/mi': return 100;
-                case 'Wh/km': return 62;
-                case 'm/kJ': return 0.45;
-                case 'J/m': return 224;
+                case 'mi/kWh': return 0.5;
+                case 'km/kWh': return 0.8;
+                case 'kWh/100mi': return 12.5;
+                case 'kWh/100km': return 7.8;
+                case 'Wh/mi': return 125;
+                case 'Wh/km': return 78;
+                case 'm/kJ': return 0.3;
+                case 'J/m': return 278;
                 default: return 0.1;
             }
         }
@@ -803,15 +827,15 @@
         // Get appropriate maximum value for EV efficiency unit
         function getEvEfficiencyMaximum(unit) {
             switch(unit) {
-                case 'mi/kWh': return 10;
-                case 'km/kWh': return 16.1;
-                case 'kWh/100mi': return 100;
-                case 'kWh/100km': return 62.1;
-                case 'Wh/mi': return 1000;
-                case 'Wh/km': return 621;
-                case 'm/kJ': return 4.47;
-                case 'J/m': return 2237;
-                default: return 1000;
+                case 'mi/kWh': return 12;
+                case 'km/kWh': return 19.3;
+                case 'kWh/100mi': return 200;
+                case 'kWh/100km': return 124;
+                case 'Wh/mi': return 2000;
+                case 'Wh/km': return 1243;
+                case 'm/kJ': return 5.4;
+                case 'J/m': return 3333;
+                default: return 2000;
             }
         }
 
@@ -864,10 +888,17 @@
         };
 
         // Unit conversion functions
-        function convertEvEfficiency(value, fromUnit, toUnit) {
-            // Input validation
+        function convertEvEfficiency(value, fromUnit, toUnit, allowExtreme = false) {
+            // Input validation with bounds checking
             if (isNaN(value) || value === null || value === undefined || value <= 0) {
                 return getEvEfficiencyMinimum(toUnit); // Return unit-appropriate default
+            }
+            
+            // Only clamp to reasonable bounds for user inputs, not equivalence calculations
+            if (!allowExtreme) {
+                const inputMin = getEvEfficiencyMinimum(fromUnit);
+                const inputMax = getEvEfficiencyMaximum(fromUnit);
+                value = Math.max(inputMin, Math.min(inputMax, value));
             }
             
             if (fromUnit === toUnit) return value;
@@ -937,10 +968,24 @@
             return miPerKwh;
         }
 
-        function convertFuelEfficiency(value, fromUnit, toUnit) {
-            // Input validation
+        function convertFuelEfficiency(value, fromUnit, toUnit, allowExtreme = false) {
+            // Input validation with bounds checking
             if (isNaN(value) || value === null || value === undefined || value <= 0) {
-                return 0.1; // Return safe default
+                return 20.0; // Return reasonable default mpgUK
+            }
+            
+            // Only clamp to realistic ranges for user inputs, not equivalence calculations
+            if (!allowExtreme) {
+                const ranges = {
+                    'mpgUK': { min: 5.0, max: 150.0 },
+                    'mpgUS': { min: 4.2, max: 125.0 },
+                    'km/L': { min: 1.8, max: 53.0 },
+                    'L/100km': { min: 1.9, max: 56.6 }
+                };
+                
+                if (ranges[fromUnit]) {
+                    value = Math.max(ranges[fromUnit].min, Math.min(ranges[fromUnit].max, value));
+                }
             }
             
             if (fromUnit === toUnit) return value;
@@ -1025,7 +1070,25 @@
             return state.fuelCostUnit; // Now directly returns 'L', 'galUK', or 'galUS'
         }
         
-        function convertEvCost(value, fromUnit, toUnit) {
+        function convertEvCost(value, fromUnit, toUnit, allowExtreme = false) {
+            // Input validation with bounds checking
+            if (isNaN(value) || value === null || value === undefined || value < 0) {
+                return 30.0; // Return reasonable default p/kWh
+            }
+            
+            // Only clamp to realistic cost ranges for user inputs, not equivalence calculations
+            if (!allowExtreme) {
+                const maxCosts = {
+                    'p/kWh': 120.0, '¢/kWh': 120.0, 'c/kWh': 120.0,
+                    'p/Wh': 0.35, '¢/Wh': 0.35, 'c/Wh': 0.35,
+                    'p/MJ': 90.0, '¢/MJ': 90.0, 'c/MJ': 90.0
+                };
+                
+                if (maxCosts[fromUnit]) {
+                    value = Math.max(0, Math.min(maxCosts[fromUnit], value));
+                }
+            }
+            
             if (fromUnit === toUnit) return value;
             
             // Constants
@@ -1084,10 +1147,10 @@
 
         // Calculate cost per mile for EV
         function calculateEvCostPerMile() {
-            let efficiency = convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh');
+            let efficiency = convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh', true); // Allow extreme values
             
             // Convert EV cost to p/kWh for calculation
-            let costInPPerKwh = convertEvCost(state.evCost, state.evCostUnit, 'p/kWh');
+            let costInPPerKwh = convertEvCost(state.evCost, state.evCostUnit, 'p/kWh', true); // Allow extreme values
             let costPerKwh = costInPPerKwh / 100; // Convert to base unit
             
             let costPerMile = costPerKwh / efficiency;
@@ -1101,7 +1164,7 @@
 
         // Calculate cost per mile for petrol
         function calculatePetrolCostPerMile() {
-            let efficiency = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK');
+            let efficiency = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK', true); // Allow extreme values
             let costPerUnit = state.petrolCost / 100; // Convert currency to base unit
             
             // Convert cost to per litre if needed
@@ -1175,28 +1238,35 @@
             const minAnnual = 0;
             const maxAnnual = 20000;
             
-            // Convert to current period
+            // Convert to current period with precise calculation
             const minForPeriod = convertAnnualToUsagePeriod(minAnnual, state.usagePeriod);
             const maxForPeriod = convertAnnualToUsagePeriod(maxAnnual, state.usagePeriod);
             
-            // Update slider range
-            elements.usageDistance.min = Math.round(minForPeriod);
-            elements.usageDistance.max = Math.round(maxForPeriod);
+            // Update slider range with proper rounding
+            elements.usageDistance.min = Math.floor(minForPeriod);
+            elements.usageDistance.max = Math.ceil(maxForPeriod);
             
-            // Set appropriate step size
-            if (state.usagePeriod === 'day') {
-                elements.usageDistance.step = '1';
-            } else if (state.usagePeriod === 'week') {
-                elements.usageDistance.step = '5';
-            } else if (state.usagePeriod === 'month') {
-                elements.usageDistance.step = '25';
-            } else { // year
-                elements.usageDistance.step = '100';
-            }
+            // Set appropriate step size based on period
+            const stepSizes = {
+                'day': 1,
+                'week': 5,
+                'month': 10,
+                'year': 50
+            };
+            elements.usageDistance.step = stepSizes[state.usagePeriod] || 1;
             
-            // Update the current distance for display
+            // Update the current distance for display with precision preservation
             const currentDistance = getCurrentPeriodDistance();
-            state.usageDistance = Math.round(currentDistance);
+            // Use appropriate rounding based on period
+            if (state.usagePeriod === 'day') {
+                state.usageDistance = Math.round(currentDistance);
+            } else if (state.usagePeriod === 'week') {
+                state.usageDistance = Math.round(currentDistance / 5) * 5; // Round to nearest 5
+            } else if (state.usagePeriod === 'month') {
+                state.usageDistance = Math.round(currentDistance / 10) * 10; // Round to nearest 10
+            } else { // year
+                state.usageDistance = Math.round(currentDistance / 50) * 50; // Round to nearest 50
+            }
         }
 
         function calculateUsageCosts() {
@@ -1256,141 +1326,151 @@
             elements.usageCostValue.textContent = `${cost} per ${periodText}`;
         }
 
-        // Update displays
+        // Update displays with better race condition handling
         function updateDisplays() {
-            if (isUpdating) return; // Prevent circular updates
-            isUpdating = true;
-            
-            // Only update input values if they're not currently focused (being edited)
-            if (document.activeElement !== elements.evEfficiencyDisplay) {
-                const precision = getEvEfficiencyPrecision(state.evEfficiencyUnit);
-                elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(precision);
-            }
-            if (document.activeElement !== elements.evCostDisplay) {
-                elements.evCostDisplay.value = state.evCost.toFixed(1);
-            }
-            if (document.activeElement !== elements.petrolEfficiencyDisplay) {
-                elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
-            }
-            if (document.activeElement !== elements.petrolCostDisplay) {
-                elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
-            }
-            if (document.activeElement !== elements.usageDistanceDisplay) {
-                elements.usageDistanceDisplay.value = state.usageDistance.toString();
-            }
-            
-            // Update sliders to match displays
-            elements.usageDistance.value = state.usageDistance;
-            
-            // Update unit labels - no longer needed as unit is now in selector
-            
-            // Update fuel cost unit display text with currency
-            const volumeUnit = state.fuelCostUnit;
-            const currency = getEvCostCurrencySymbol(); // Use same currency as EV costs
-            elements.fuelCostUnitDisplay.textContent = `${currency} per`;
-            elements.fuelCostUnit.value = volumeUnit;
-            
-            const costPerMile = calculateEvCostPerMile();
-            const costPerKm = costPerMile * MILES_PER_KM;
-            
-            // Determine distance unit from EV efficiency unit
-            const isMetric = state.evEfficiencyUnit.includes('km') || 
-                           state.evEfficiencyUnit.includes('J/m') || 
-                           state.evEfficiencyUnit.includes('m/kJ');
-            
-            if (isMetric) {
-                elements.equivalenceDisplay.textContent = `Cost per km: ${(costPerKm * 100).toFixed(2)}${currency}`;
-            } else {
-                elements.equivalenceDisplay.textContent = `Cost per mile: ${(costPerMile * 100).toFixed(2)}${currency}`;
-            }
-            
-            // Update usage calculator display
-            updateUsageDisplay();
-            
-            isUpdating = false; // Reset flag
+            // Use the scheduled update system for better race condition handling
+            scheduleUpdate(() => {
+                // Only update input values if they're not currently focused (being edited)
+                if (document.activeElement !== elements.evEfficiencyDisplay) {
+                    const precision = getEvEfficiencyPrecision(state.evEfficiencyUnit);
+                    elements.evEfficiencyDisplay.value = state.evEfficiency.toFixed(precision);
+                }
+                if (document.activeElement !== elements.evCostDisplay) {
+                    elements.evCostDisplay.value = state.evCost.toFixed(1);
+                }
+                if (document.activeElement !== elements.petrolEfficiencyDisplay) {
+                    elements.petrolEfficiencyDisplay.value = state.petrolEfficiency.toFixed(1);
+                }
+                if (document.activeElement !== elements.petrolCostDisplay) {
+                    elements.petrolCostDisplay.value = state.petrolCost.toFixed(1);
+                }
+                if (document.activeElement !== elements.usageDistanceDisplay) {
+                    elements.usageDistanceDisplay.value = state.usageDistance.toString();
+                }
+                
+                // Update sliders to match state
+                elements.evEfficiency.value = state.evEfficiency;
+                elements.evCost.value = state.evCost;
+                elements.petrolEfficiency.value = state.petrolEfficiency;
+                elements.petrolCost.value = state.petrolCost;
+                elements.usageDistance.value = state.usageDistance;
+                
+                // Update fuel cost unit display text with currency
+                const volumeUnit = state.fuelCostUnit;
+                const currency = getEvCostCurrencySymbol(); // Use same currency as EV costs
+                elements.fuelCostUnitDisplay.textContent = `${currency} per`;
+                elements.fuelCostUnit.value = volumeUnit;
+                
+                // Calculate and display cost equivalence
+                const costPerMile = calculateEvCostPerMile();
+                const costPerKm = costPerMile * MILES_PER_KM;
+                
+                // Determine distance unit from EV efficiency unit
+                const isMetric = state.evEfficiencyUnit.includes('km') || 
+                               state.evEfficiencyUnit.includes('J/m') || 
+                               state.evEfficiencyUnit.includes('m/kJ');
+                
+                if (isMetric) {
+                    elements.equivalenceDisplay.textContent = `Cost per km: ${(costPerKm * 100).toFixed(2)}${currency}`;
+                } else {
+                    elements.equivalenceDisplay.textContent = `Cost per mile: ${(costPerMile * 100).toFixed(2)}${currency}`;
+                }
+                
+                // Update usage calculator display
+                updateUsageDisplay();
+            });
         }
 
-        // Update slider ranges based on units - aligned for rounder numbers
+        // Update slider ranges based on units - realistic efficiency values
         function updateSliderRanges() {
-            // EV efficiency ranges based on realistic values - aligned to hit round numbers
+            // EV efficiency ranges - expanded for high-efficiency vehicles
             if (state.evEfficiencyUnit === 'mi/kWh') {
-                elements.evEfficiency.min = 1.0;
-                elements.evEfficiency.max = 10.0;
+                elements.evEfficiency.min = 1.0; // Poor efficiency
+                elements.evEfficiency.max = 8.0; // Excellent efficiency (e.g., Lucid Air)
                 elements.evEfficiency.step = 0.1;
             } else if (state.evEfficiencyUnit === 'km/kWh') {
-                elements.evEfficiency.min = 1.6; // Keeps same functional range
-                elements.evEfficiency.max = 16.0; // Rounds to 16.0
+                elements.evEfficiency.min = 1.6; // Poor efficiency (1.0 mi/kWh)
+                elements.evEfficiency.max = 12.9; // Excellent efficiency (8.0 mi/kWh)
                 elements.evEfficiency.step = 0.1;
             } else if (state.evEfficiencyUnit === 'kWh/100mi') {
-                elements.evEfficiency.min = 10.0;
-                elements.evEfficiency.max = 100.0;
+                elements.evEfficiency.min = 12.5; // Excellent efficiency (8.0 mi/kWh)
+                elements.evEfficiency.max = 100.0; // Poor efficiency (1.0 mi/kWh)
                 elements.evEfficiency.step = 0.5;
             } else if (state.evEfficiencyUnit === 'kWh/100km') {
-                elements.evEfficiency.min = 6.0; // Round down from 6.2
-                elements.evEfficiency.max = 62.0; // Round down from 62.1
+                elements.evEfficiency.min = 7.8; // Excellent efficiency (12.9 km/kWh)
+                elements.evEfficiency.max = 62.1; // Poor efficiency (1.6 km/kWh)
                 elements.evEfficiency.step = 0.5;
             } else if (state.evEfficiencyUnit === 'Wh/mi') {
-                elements.evEfficiency.min = 100;
-                elements.evEfficiency.max = 1000;
+                elements.evEfficiency.min = 125; // Excellent efficiency (8.0 mi/kWh)
+                elements.evEfficiency.max = 1000; // Poor efficiency (1.0 mi/kWh)
                 elements.evEfficiency.step = 10;
             } else if (state.evEfficiencyUnit === 'Wh/km') {
-                elements.evEfficiency.min = 60; // Round from 62
-                elements.evEfficiency.max = 620; // Round from 621
+                elements.evEfficiency.min = 78; // Excellent efficiency (12.9 km/kWh)
+                elements.evEfficiency.max = 621; // Poor efficiency (1.6 km/kWh)
                 elements.evEfficiency.step = 5;
             } else if (state.evEfficiencyUnit === 'm/kJ') {
-                elements.evEfficiency.min = 0.4; // Round from 0.45 for cleaner steps
-                elements.evEfficiency.max = 4.5; // Round from 4.47
+                elements.evEfficiency.min = 0.45; // Poor efficiency
+                elements.evEfficiency.max = 3.6; // Excellent efficiency
                 elements.evEfficiency.step = 0.01;
             } else if (state.evEfficiencyUnit === 'J/m') {
-                elements.evEfficiency.min = 220; // Round from 224
-                elements.evEfficiency.max = 2240; // Round from 2237
+                elements.evEfficiency.min = 278; // Excellent efficiency
+                elements.evEfficiency.max = 2222; // Poor efficiency
                 elements.evEfficiency.step = 10;
             }
             
-            // Fuel efficiency ranges - aligned for round numbers
+            // Fuel efficiency ranges - expanded for high-efficiency vehicles including hybrids
             if (state.fuelEfficiencyUnit === 'mpgUK') {
-                elements.petrolEfficiency.min = 10.0;
-                elements.petrolEfficiency.max = 80.0;
-                elements.petrolEfficiency.step = 0.5; // Gives 10.0, 10.5, 11.0, etc.
+                elements.petrolEfficiency.min = 10.0; // Poor fuel economy
+                elements.petrolEfficiency.max = 120.0; // Excellent fuel economy (e.g., Toyota Prius, some hybrids)
+                elements.petrolEfficiency.step = 0.5;
             } else if (state.fuelEfficiencyUnit === 'mpgUS') {
-                elements.petrolEfficiency.min = 8.0; // Round from 8.3
-                elements.petrolEfficiency.max = 67.0; // Round from 66.6
+                elements.petrolEfficiency.min = 8.3; // Poor fuel economy
+                elements.petrolEfficiency.max = 100.0; // Excellent fuel economy (hybrids)
                 elements.petrolEfficiency.step = 0.5;
             } else if (state.fuelEfficiencyUnit === 'km/L') {
-                elements.petrolEfficiency.min = 3.0; // Round from 3.5 for cleaner start
-                elements.petrolEfficiency.max = 28.0; // Round from 28.2
+                elements.petrolEfficiency.min = 3.5; // Poor fuel economy
+                elements.petrolEfficiency.max = 42.3; // Excellent fuel economy (120 mpgUK)
                 elements.petrolEfficiency.step = 0.1;
             } else if (state.fuelEfficiencyUnit === 'L/100km') {
-                elements.petrolEfficiency.min = 3.0; // Round from 3.5
-                elements.petrolEfficiency.max = 28.0; // Round from 28.2
+                elements.petrolEfficiency.min = 2.4; // Excellent fuel economy (42.3 km/L)
+                elements.petrolEfficiency.max = 28.6; // Poor fuel economy (3.5 km/L)
                 elements.petrolEfficiency.step = 0.1;
             }
             
-            // Energy cost ranges - aligned for round currency amounts
+            // Energy cost ranges - expanded for diverse pricing scenarios
             if (state.evCostUnit.includes('/Wh')) {
-                elements.evCost.min = 0.01;
-                elements.evCost.max = 15.0; // Round max
-                elements.evCost.step = 0.01;
+                elements.evCost.min = 0.005;
+                elements.evCost.max = 0.30; // Expanded Wh pricing range
+                elements.evCost.step = 0.001;
             } else if (state.evCostUnit.includes('/MJ')) {
-                elements.evCost.min = 0.1;
-                elements.evCost.max = 50.0; // Round max
+                elements.evCost.min = 0.5;
+                elements.evCost.max = 80.0; // Expanded MJ pricing range
                 elements.evCost.step = 0.1;
             } else {
-                elements.evCost.min = 0.0; // Start at 0 for round increments
-                elements.evCost.max = 150.0;
+                elements.evCost.min = 2.0; // Very cheap off-peak electricity
+                elements.evCost.max = 100.0; // Expensive peak electricity
                 elements.evCost.step = 0.1;
             }
             
-            // Petrol cost range - aligned for round currency amounts
-            elements.petrolCost.min = 0.0; // Start at 0 for round increments
-            elements.petrolCost.max = 200.0;
-            elements.petrolCost.step = 0.1; // Gives 0.0, 0.1, 0.2... cleaner than 10.0, 10.1, 10.2
+            // Petrol cost range - expanded for global pricing variations
+            elements.petrolCost.min = 50.0; // Very cheap fuel regions
+            elements.petrolCost.max = 300.0; // Very expensive fuel regions
+            elements.petrolCost.step = 0.1;
         }
 
         // Maintain equivalence using virtual locking based on modification order
         function maintainEquivalence(changedParameter) {
+            // Prevent recursive calls and race conditions
+            if (isUpdating) return;
+            
             const evCostPerMile = calculateEvCostPerMile();
             const petrolCostPerMile = calculatePetrolCostPerMile();
+            
+            // Only adjust if costs are significantly different (prevent micro-adjustments)
+            const tolerance = 0.0001; // 0.01p difference
+            if (Math.abs(evCostPerMile - petrolCostPerMile) < tolerance) {
+                return;
+            }
             
             // Get all parameters except the one that just changed
             const otherParams = ['evEfficiency', 'evCost', 'petrolEfficiency', 'petrolCost']
@@ -1402,16 +1482,18 @@
             // The oldest modified parameter is the one we'll adjust
             const paramToAdjust = otherParams[0];
             
-            // Adjust the oldest parameter to maintain equivalence
-            if (paramToAdjust === 'evEfficiency') {
-                adjustEvEfficiency(petrolCostPerMile);
-            } else if (paramToAdjust === 'evCost') {
-                adjustEvCost(petrolCostPerMile);
-            } else if (paramToAdjust === 'petrolEfficiency') {
-                adjustPetrolEfficiency(evCostPerMile);
-            } else if (paramToAdjust === 'petrolCost') {
-                adjustPetrolCost(evCostPerMile);
-            }
+            // Schedule the adjustment to prevent race conditions
+            scheduleUpdate(() => {
+                if (paramToAdjust === 'evEfficiency') {
+                    adjustEvEfficiency(petrolCostPerMile);
+                } else if (paramToAdjust === 'evCost') {
+                    adjustEvCost(petrolCostPerMile);
+                } else if (paramToAdjust === 'petrolEfficiency') {
+                    adjustPetrolEfficiency(evCostPerMile);
+                } else if (paramToAdjust === 'petrolCost') {
+                    adjustPetrolCost(evCostPerMile);
+                }
+            });
         }
         
         function adjustPetrolEfficiency(evCostPerMile) {
@@ -1424,13 +1506,14 @@
             }
             
             let targetEfficiency = (costPerLitre * LITRES_PER_UK_GALLON) / evCostPerMile;
-            targetEfficiency = convertFuelEfficiency(targetEfficiency, 'mpgUK', state.fuelEfficiencyUnit);
-            state.petrolEfficiency = Math.max(0.1, targetEfficiency);
+            targetEfficiency = convertFuelEfficiency(targetEfficiency, 'mpgUK', state.fuelEfficiencyUnit, true); // Allow extreme values
+            // Allow any efficiency value for equivalence - no bounds checking
+            state.petrolEfficiency = Math.max(0.1, targetEfficiency); // Only prevent zero/negative
             elements.petrolEfficiency.value = state.petrolEfficiency;
         }
         
         function adjustPetrolCost(evCostPerMile) {
-            let mpgUK = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK');
+            let mpgUK = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK', true); // Allow extreme values
             let targetCostPerLitre = (evCostPerMile * mpgUK) / LITRES_PER_UK_GALLON;
             
             const volumeUnit = getFuelVolumeUnit();
@@ -1441,7 +1524,8 @@
                 targetCost = targetCostPerLitre * LITRES_PER_US_GALLON * 100;
             }
             
-            state.petrolCost = Math.max(0.1, targetCost);
+            // Allow any cost value for equivalence - no bounds checking
+            state.petrolCost = Math.max(0.1, targetCost); // Only prevent zero/negative
             elements.petrolCost.value = state.petrolCost;
         }
         
@@ -1451,55 +1535,70 @@
             if (state.includeChargingLosses) {
                 targetEfficiency /= (1 + state.chargingLosses / 100);
             }
-            targetEfficiency = convertEvEfficiency(targetEfficiency, 'mi/kWh', state.evEfficiencyUnit);
-            state.evEfficiency = clampEvEfficiency(targetEfficiency, state.evEfficiencyUnit);
+            targetEfficiency = convertEvEfficiency(targetEfficiency, 'mi/kWh', state.evEfficiencyUnit, true); // Allow extreme values
+            // Allow any efficiency value for equivalence - no bounds checking
+            const minValue = getEvEfficiencyMinimum(state.evEfficiencyUnit);
+            state.evEfficiency = Math.max(minValue, targetEfficiency); // Only prevent impossible values
             elements.evEfficiency.value = state.evEfficiency;
         }
         
         function adjustEvCost(petrolCostPerMile) {
-            let targetCostInP = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh') * 100;
+            let targetCostInP = petrolCostPerMile * convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh', true) * 100; // Allow extreme values
             if (state.includeChargingLosses) {
                 targetCostInP *= (1 + state.chargingLosses / 100);
             }
             
             // Convert from p/kWh to current unit
-            let targetCost = convertEvCost(targetCostInP, 'p/kWh', state.evCostUnit);
+            let targetCost = convertEvCost(targetCostInP, 'p/kWh', state.evCostUnit, true); // Allow extreme values
             
-            state.evCost = Math.max(0.1, targetCost);
+            // Allow any cost value for equivalence - no bounds checking
+            state.evCost = Math.max(0.1, targetCost); // Only prevent zero/negative
             elements.evCost.value = state.evCost;
         }
 
-        // Event listeners
+        // Event listeners with improved debouncing
         elements.evEfficiency.addEventListener('input', (e) => {
             if (isUpdating) return;
-            state.evEfficiency = parseFloat(e.target.value);
-            updateLastModified('evEfficiency');
-            maintainEquivalence('evEfficiency');
-            updateDisplays();
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+                state.evEfficiency = value;
+                updateLastModified('evEfficiency');
+                maintainEquivalence('evEfficiency');
+                updateDisplays();
+            }
         });
 
         elements.evCost.addEventListener('input', (e) => {
             if (isUpdating) return;
-            state.evCost = parseFloat(e.target.value);
-            updateLastModified('evCost');
-            maintainEquivalence('evCost');
-            updateDisplays();
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+                state.evCost = value;
+                updateLastModified('evCost');
+                maintainEquivalence('evCost');
+                updateDisplays();
+            }
         });
 
         elements.petrolEfficiency.addEventListener('input', (e) => {
             if (isUpdating) return;
-            state.petrolEfficiency = parseFloat(e.target.value);
-            updateLastModified('petrolEfficiency');
-            maintainEquivalence('petrolEfficiency');
-            updateDisplays();
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+                state.petrolEfficiency = value;
+                updateLastModified('petrolEfficiency');
+                maintainEquivalence('petrolEfficiency');
+                updateDisplays();
+            }
         });
 
         elements.petrolCost.addEventListener('input', (e) => {
             if (isUpdating) return;
-            state.petrolCost = parseFloat(e.target.value);
-            updateLastModified('petrolCost');
-            maintainEquivalence('petrolCost');
-            updateDisplays();
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+                state.petrolCost = value;
+                updateLastModified('petrolCost');
+                maintainEquivalence('petrolCost');
+                updateDisplays();
+            }
         });
 
         // Value display input event listeners - use blur and change events to avoid jumping values while typing
