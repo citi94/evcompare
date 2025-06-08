@@ -689,9 +689,9 @@
             font-weight: 600;
             box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
             margin-top: 20px;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+            display: block;
+            visibility: visible;
+            opacity: 1;
         }
 
         .savings-display.ice-cheaper {
@@ -1499,7 +1499,8 @@
                 // Hide savings-only container in equivalence mode
                 const savingsOnlyContainer = document.getElementById('usage-savings-only-container');
                 if (savingsOnlyContainer) {
-                    savingsOnlyContainer.style.display = 'none';
+                    savingsOnlyContainer.style.setProperty('display', 'none', 'important');
+                    savingsOnlyContainer.style.setProperty('visibility', 'hidden', 'important');
                 }
             } else {
                 // Hide the usage results container in comparison mode too
@@ -1549,12 +1550,14 @@
                     savingsOnlyContainer.innerHTML = isEvCheaper 
                         ? `EVs save ${currency}${savingsAmount} per ${periodText} compared to ICE vehicles`
                         : `EVs cost ${currency}${savingsAmount} more per ${periodText} than ICE vehicles`;
-                    savingsOnlyContainer.style.display = 'block';
+                    savingsOnlyContainer.style.setProperty('display', 'block', 'important');
+                    savingsOnlyContainer.style.setProperty('visibility', 'visible', 'important');
                 } else {
                     // Hide savings-only container when costs are identical
                     const savingsOnlyContainer = document.getElementById('usage-savings-only-container');
                     if (savingsOnlyContainer) {
-                        savingsOnlyContainer.style.display = 'none';
+                        savingsOnlyContainer.style.setProperty('display', 'none', 'important');
+                        savingsOnlyContainer.style.setProperty('visibility', 'hidden', 'important');
                     }
                 }
             }
@@ -1659,7 +1662,8 @@
                 // Hide savings container in equivalence mode
                 const savingsContainer = document.getElementById('savings-container');
                 if (savingsContainer) {
-                    savingsContainer.style.display = 'none';
+                    savingsContainer.style.setProperty('display', 'none', 'important');
+                    savingsContainer.style.setProperty('visibility', 'hidden', 'important');
                 }
             } else {
                 // Show split comparison
@@ -1692,10 +1696,12 @@
                     savingsContainer.innerHTML = isEvCheaper 
                         ? `EVs save ${savingsAmount}${currency} per ${distanceUnit} compared to ICE vehicles`
                         : `EVs cost ${savingsAmount}${currency} more per ${distanceUnit} than ICE vehicles`;
-                    savingsContainer.style.display = 'block';
+                    savingsContainer.style.setProperty('display', 'block', 'important');
+                    savingsContainer.style.setProperty('visibility', 'visible', 'important');
                 } else {
                     // Hide savings container when costs are identical
-                    savingsContainer.style.display = 'none';
+                    savingsContainer.style.setProperty('display', 'none', 'important');
+                    savingsContainer.style.setProperty('visibility', 'hidden', 'important');
                 }
             }
         }
