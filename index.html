@@ -751,6 +751,49 @@
                 transform: scale(1.05);
             }
             
+            /* Fix text alignment and dropdown positioning for iPhone */
+            .slider-label {
+                justify-content: flex-start !important;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+            
+            .label-text {
+                flex-shrink: 0;
+                font-size: 0.85em;
+                margin-right: auto;
+            }
+            
+            .value-container {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex-wrap: nowrap;
+                flex-shrink: 0;
+                margin-left: auto;
+            }
+            
+            .value-display {
+                width: 70px;
+                flex-shrink: 0;
+                font-size: 0.85em;
+                text-align: right;
+            }
+            
+            .unit-label {
+                flex-shrink: 0;
+                font-size: 0.85em;
+                white-space: nowrap;
+            }
+            
+            .unit-select {
+                font-size: 0.85em;
+                padding: 2px 4px;
+                min-width: 80px;
+            }
+            
             .savings-display {
                 padding: 15px;
                 font-size: 1.1em;
