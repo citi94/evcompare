@@ -799,6 +799,223 @@
                 font-size: 1.1em;
             }
         }
+
+        /* Rachel's 2028 Budget Section Styles */
+        .reeves-2028-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .reeves-2028-btn {
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reeves-2028-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+        }
+
+        .reeves-2028-btn:active {
+            transform: scale(0.98);
+        }
+
+        .reeves-2028-btn.active {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .reeves-icon {
+            font-size: 1.3em;
+        }
+
+        .reeves-breakdown {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .reeves-breakdown.hidden {
+            display: none;
+        }
+
+        .reeves-title {
+            text-align: center;
+            color: #8e44ad;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .reeves-comparison {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reeves-column {
+            flex: 1;
+            max-width: 250px;
+            padding: 15px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .reeves-column h4 {
+            text-align: center;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .reeves-today h4 {
+            color: #7f8c8d;
+        }
+
+        .reeves-2028 h4 {
+            color: #8e44ad;
+        }
+
+        .reeves-arrow {
+            display: flex;
+            align-items: center;
+            font-size: 2em;
+            color: #8e44ad;
+            font-weight: bold;
+        }
+
+        .reeves-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .reeves-item:last-child {
+            border-bottom: none;
+        }
+
+        .reeves-label {
+            font-size: 0.9em;
+            color: #34495e;
+        }
+
+        .reeves-value {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .ev-item .reeves-value {
+            color: #3498db;
+        }
+
+        .ice-item .reeves-value {
+            color: #e74c3c;
+        }
+
+        .savings-item .reeves-value {
+            color: #27ae60;
+        }
+
+        .savings-item.negative .reeves-value {
+            color: #e74c3c;
+        }
+
+        .reeves-change {
+            font-size: 0.8em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            width: 100%;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .reeves-change.increase {
+            background: #ffebee;
+            color: #c0392b;
+        }
+
+        .reeves-change.decrease {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .reeves-annual-impact {
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+        }
+
+        .reeves-info-box {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .reeves-info-box p {
+            margin: 0 0 10px 0;
+        }
+
+        .reeves-info-box ul {
+            margin: 0 0 10px 0;
+            padding-left: 20px;
+        }
+
+        .reeves-info-box li {
+            margin: 5px 0;
+        }
+
+        .reeves-source {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 0 !important;
+        }
+
+        @media (max-width: 768px) {
+            .reeves-2028-btn {
+                padding: 12px 20px;
+                font-size: 0.9em;
+            }
+
+            .reeves-comparison {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .reeves-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+
+            .reeves-column {
+                width: 100%;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -961,6 +1178,69 @@
             </div>
         </div>
 
+        <!-- Rachel's 2028 Budget Section -->
+        <div class="reeves-2028-section">
+            <button id="reeves-2028-btn" class="reeves-2028-btn">
+                <span class="reeves-icon">🏛️</span>
+                <span id="reeves-2028-text">Show Rachel's 2028 Budget Impact</span>
+            </button>
+
+            <div id="reeves-2028-breakdown" class="reeves-breakdown hidden">
+                <h3 class="reeves-title">Autumn Budget 2025: April 2028 Changes</h3>
+
+                <div class="reeves-comparison">
+                    <div class="reeves-column reeves-today">
+                        <h4>Today (2025)</h4>
+                        <div class="reeves-item ev-item">
+                            <span class="reeves-label">⚡ EV cost/mile:</span>
+                            <span class="reeves-value" id="ev-cost-today">0.00p</span>
+                        </div>
+                        <div class="reeves-item ice-item">
+                            <span class="reeves-label">⛽ ICE cost/mile:</span>
+                            <span class="reeves-value" id="ice-cost-today">0.00p</span>
+                        </div>
+                        <div class="reeves-item savings-item">
+                            <span class="reeves-label">💰 EV savings:</span>
+                            <span class="reeves-value" id="savings-today">0.00p/mile</span>
+                        </div>
+                    </div>
+
+                    <div class="reeves-arrow">→</div>
+
+                    <div class="reeves-column reeves-2028">
+                        <h4>April 2028</h4>
+                        <div class="reeves-item ev-item">
+                            <span class="reeves-label">⚡ EV cost/mile:</span>
+                            <span class="reeves-value" id="ev-cost-2028">0.00p</span>
+                            <span class="reeves-change" id="ev-change">+3.00p</span>
+                        </div>
+                        <div class="reeves-item ice-item">
+                            <span class="reeves-label">⛽ ICE cost/mile:</span>
+                            <span class="reeves-value" id="ice-cost-2028">0.00p</span>
+                            <span class="reeves-change" id="ice-change">+0.00p</span>
+                        </div>
+                        <div class="reeves-item savings-item">
+                            <span class="reeves-label">💰 EV savings:</span>
+                            <span class="reeves-value" id="savings-2028">0.00p/mile</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reeves-annual-impact" id="reeves-annual-impact">
+                    <!-- Filled by JavaScript -->
+                </div>
+
+                <div class="reeves-info-box">
+                    <p><strong>What changes in 2028?</strong></p>
+                    <ul>
+                        <li><strong>EVs:</strong> New road charge of <strong>3p/mile</strong></li>
+                        <li><strong>Fuel:</strong> 5p/litre cut ends + ~3.5p RPI = <strong>+8.5p/litre</strong></li>
+                    </ul>
+                    <p class="reeves-source">Source: HM Treasury Autumn Budget 2025</p>
+                </div>
+            </div>
+        </div>
+
         <div class="copyright">
             © 2025 Peter Harding
         </div>
@@ -972,6 +1252,18 @@
         const LITRES_PER_US_GALLON = 3.785411784; // Exact definition
         const KM_PER_MILE = 1.609344; // Exact definition (international mile)
         const MILES_PER_KM = 1 / 1.609344; // Computed from exact mile definition
+
+        // Rachel Reeves' Autumn Budget 2025 - April 2028 changes
+        // Source: HM Treasury Autumn Budget 2025, OBR documents
+        const REEVES_2028 = {
+            evRoadCharge: 3.0,           // 3p per mile for EVs
+            phevRoadCharge: 1.5,         // 1.5p per mile for PHEVs (not used currently)
+            fuelDutyRestoration: 5.0,    // 5p/litre - temporary cut ends
+            fuelDutyRpiIncrease: 3.5,    // ~3.5p/litre estimated RPI increase (2027-2028)
+            get totalFuelDutyIncrease() {
+                return this.fuelDutyRestoration + this.fuelDutyRpiIncrease; // ~8.5p/litre total
+            }
+        };
         
         // State
         let state = {
@@ -1108,7 +1400,19 @@
             usageDistanceUnit: document.getElementById('usage-distance-unit'),
             usageCostValue: document.getElementById('usage-cost-value'),
             modeToggle: document.getElementById('mode-toggle'),
-            modeToggleText: document.getElementById('mode-toggle-text')
+            modeToggleText: document.getElementById('mode-toggle-text'),
+            reeves2028Btn: document.getElementById('reeves-2028-btn'),
+            reeves2028Text: document.getElementById('reeves-2028-text'),
+            reeves2028Breakdown: document.getElementById('reeves-2028-breakdown'),
+            evCostToday: document.getElementById('ev-cost-today'),
+            iceCostToday: document.getElementById('ice-cost-today'),
+            savingsToday: document.getElementById('savings-today'),
+            evCost2028: document.getElementById('ev-cost-2028'),
+            iceCost2028: document.getElementById('ice-cost-2028'),
+            savings2028: document.getElementById('savings-2028'),
+            evChange: document.getElementById('ev-change'),
+            iceChange: document.getElementById('ice-change'),
+            reevesAnnualImpact: document.getElementById('reeves-annual-impact')
         };
 
         // Unit conversion functions
@@ -1370,27 +1674,34 @@
         
 
         // Calculate cost per mile for EV
-        function calculateEvCostPerMile() {
+        // Set include2028 = true to add the 2028 road charge
+        function calculateEvCostPerMile(include2028 = false) {
             let efficiency = convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh', true); // Allow extreme values
-            
+
             // Convert EV cost to p/kWh for calculation
             let costInPPerKwh = convertEvCost(state.evCost, state.evCostUnit, 'p/kWh', true); // Allow extreme values
             let costPerKwh = costInPPerKwh / 100; // Convert to base unit
-            
+
             let costPerMile = costPerKwh / efficiency;
-            
+
             if (state.includeChargingLosses) {
                 costPerMile *= (1 + state.chargingLosses / 100);
             }
-            
+
+            // Add Rachel Reeves' 2028 EV road charge if requested
+            if (include2028) {
+                costPerMile += REEVES_2028.evRoadCharge / 100; // Convert pence to pounds
+            }
+
             return costPerMile;
         }
 
         // Calculate cost per mile for petrol
-        function calculatePetrolCostPerMile() {
+        // Set include2028 = true to add the 2028 fuel duty increase
+        function calculatePetrolCostPerMile(include2028 = false) {
             let efficiency = convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK', true); // Allow extreme values
             let costPerUnit = state.petrolCost / 100; // Convert currency to base unit
-            
+
             // Convert cost to per litre if needed
             const volumeUnit = getFuelVolumeUnit();
             let costPerLitre;
@@ -1401,7 +1712,12 @@
             } else {
                 costPerLitre = costPerUnit; // Already per litre
             }
-            
+
+            // Add Rachel Reeves' 2028 fuel duty increase if requested
+            if (include2028) {
+                costPerLitre += REEVES_2028.totalFuelDutyIncrease / 100; // Convert pence to pounds
+            }
+
             let costPerGallon = costPerLitre * LITRES_PER_UK_GALLON;
             return costPerGallon / efficiency;
         }
@@ -1645,7 +1961,7 @@
         // Toggle between equivalence and comparison modes
         function toggleMode() {
             state.mode = state.mode === 'equivalence' ? 'comparison' : 'equivalence';
-            
+
             // Update button appearance and text
             if (state.mode === 'comparison') {
                 elements.modeToggle.classList.add('comparison-mode');
@@ -1654,9 +1970,119 @@
                 elements.modeToggle.classList.remove('comparison-mode');
                 elements.modeToggleText.textContent = 'Unlock & Compare';
             }
-            
+
             // Update displays
             updateDisplays();
+        }
+
+        // Toggle Rachel Reeves' 2028 Budget breakdown visibility
+        function toggleReeves2028() {
+            const isVisible = !elements.reeves2028Breakdown.classList.contains('hidden');
+
+            if (isVisible) {
+                // Hide the breakdown
+                elements.reeves2028Breakdown.classList.add('hidden');
+                elements.reeves2028Btn.classList.remove('active');
+                elements.reeves2028Text.textContent = "Show Rachel's 2028 Budget Impact";
+            } else {
+                // Show the breakdown and update values
+                elements.reeves2028Breakdown.classList.remove('hidden');
+                elements.reeves2028Btn.classList.add('active');
+                elements.reeves2028Text.textContent = "Hide 2028 Budget Impact";
+                updateReeves2028Breakdown();
+            }
+        }
+
+        // Update the 2028 breakdown comparison display
+        function updateReeves2028Breakdown() {
+            if (elements.reeves2028Breakdown.classList.contains('hidden')) return;
+
+            const currency = getEvCostCurrencySymbol();
+            const mainCurrency = getMainCurrencySymbol();
+
+            // Determine distance unit from EV efficiency unit
+            const isMetric = state.evEfficiencyUnit.includes('km') ||
+                           state.evEfficiencyUnit.includes('J/m') ||
+                           state.evEfficiencyUnit.includes('m/kJ');
+            const distanceUnit = isMetric ? 'km' : 'mile';
+
+            // Calculate TODAY's costs (without 2028 adjustments)
+            let evCostTodayPerMile = calculateEvCostPerMile(false);
+            let iceCostTodayPerMile = calculatePetrolCostPerMile(false);
+
+            // Calculate 2028 costs (with adjustments)
+            let evCost2028PerMile = calculateEvCostPerMile(true);
+            let iceCost2028PerMile = calculatePetrolCostPerMile(true);
+
+            // Convert to display units if metric
+            if (isMetric) {
+                evCostTodayPerMile *= MILES_PER_KM;
+                iceCostTodayPerMile *= MILES_PER_KM;
+                evCost2028PerMile *= MILES_PER_KM;
+                iceCost2028PerMile *= MILES_PER_KM;
+            }
+
+            // Convert to pence for display
+            const evTodayPence = evCostTodayPerMile * 100;
+            const iceTodayPence = iceCostTodayPerMile * 100;
+            const ev2028Pence = evCost2028PerMile * 100;
+            const ice2028Pence = iceCost2028PerMile * 100;
+
+            // Calculate savings
+            const savingsTodayPence = iceTodayPence - evTodayPence;
+            const savings2028Pence = ice2028Pence - ev2028Pence;
+
+            // Calculate changes
+            const evChangePence = ev2028Pence - evTodayPence;
+            const iceChangePence = ice2028Pence - iceTodayPence;
+
+            // Update Today column
+            elements.evCostToday.textContent = `${evTodayPence.toFixed(2)}${currency}`;
+            elements.iceCostToday.textContent = `${iceTodayPence.toFixed(2)}${currency}`;
+
+            if (savingsTodayPence >= 0) {
+                elements.savingsToday.textContent = `${savingsTodayPence.toFixed(2)}${currency}/${distanceUnit}`;
+                elements.savingsToday.parentElement.classList.remove('negative');
+            } else {
+                elements.savingsToday.textContent = `${Math.abs(savingsTodayPence).toFixed(2)}${currency} extra`;
+                elements.savingsToday.parentElement.classList.add('negative');
+            }
+
+            // Update 2028 column
+            elements.evCost2028.textContent = `${ev2028Pence.toFixed(2)}${currency}`;
+            elements.iceCost2028.textContent = `${ice2028Pence.toFixed(2)}${currency}`;
+
+            if (savings2028Pence >= 0) {
+                elements.savings2028.textContent = `${savings2028Pence.toFixed(2)}${currency}/${distanceUnit}`;
+                elements.savings2028.parentElement.classList.remove('negative');
+            } else {
+                elements.savings2028.textContent = `${Math.abs(savings2028Pence).toFixed(2)}${currency} extra`;
+                elements.savings2028.parentElement.classList.add('negative');
+            }
+
+            // Update change indicators
+            elements.evChange.textContent = `+${evChangePence.toFixed(2)}${currency}`;
+            elements.evChange.className = 'reeves-change increase';
+
+            elements.iceChange.textContent = `+${iceChangePence.toFixed(2)}${currency}`;
+            elements.iceChange.className = 'reeves-change increase';
+
+            // Calculate annual impact based on usage distance
+            const annualDistance = state.usageAnnualDistance;
+            const annualEvExtraCost = (evChangePence / 100) * annualDistance;
+            const annualIceExtraCost = (iceChangePence / 100) * annualDistance;
+            const annualSavingsChange = annualIceExtraCost - annualEvExtraCost;
+
+            // Update annual impact display
+            let annualText = '';
+            if (annualSavingsChange > 0) {
+                annualText = `Based on ${Math.round(annualDistance).toLocaleString()} ${isMetric ? 'km' : 'miles'}/year: EVs will save <strong>${mainCurrency}${Math.abs(annualSavingsChange).toFixed(0)}</strong> more annually vs ICE in 2028`;
+            } else if (annualSavingsChange < 0) {
+                annualText = `Based on ${Math.round(annualDistance).toLocaleString()} ${isMetric ? 'km' : 'miles'}/year: EV savings will reduce by <strong>${mainCurrency}${Math.abs(annualSavingsChange).toFixed(0)}</strong> annually in 2028`;
+            } else {
+                annualText = `Based on ${Math.round(annualDistance).toLocaleString()} ${isMetric ? 'km' : 'miles'}/year: No change in relative savings`;
+            }
+            elements.reevesAnnualImpact.innerHTML = annualText;
         }
 
         // Update displays with better race condition handling
@@ -1696,9 +2122,12 @@
                 
                 // Update main cost display based on mode
                 updateCostDisplay();
-                
+
                 // Update usage calculator display
                 updateUsageDisplay();
+
+                // Update 2028 breakdown if visible
+                updateReeves2028Breakdown();
             });
         }
 
@@ -2226,6 +2655,11 @@
         // Mode toggle event listener
         elements.modeToggle.addEventListener('click', () => {
             toggleMode();
+        });
+
+        // Rachel Reeves' 2028 Budget toggle event listener
+        elements.reeves2028Btn.addEventListener('click', () => {
+            toggleReeves2028();
         });
 
         // Initialize
