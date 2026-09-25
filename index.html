@@ -84,6 +84,7 @@
         }
 
         .section {
+            min-width: 0; /* let long preset labels truncate instead of widening the grid */
             background: #f8f9fa;
             padding: 25px;
             border-radius: 15px;
@@ -800,6 +801,96 @@
             }
         }
 
+        /* Real-world presets */
+        .preset-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .preset-label {
+            font-weight: 500;
+            color: #34495e;
+            font-size: 0.9em;
+            min-width: 62px;
+        }
+
+        .preset-select {
+            flex: 1;
+            min-width: 0;
+            padding: 6px 8px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9em;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .ev-section .preset-select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .petrol-section .preset-select:focus {
+            border-color: #e74c3c;
+            outline: none;
+        }
+
+        .preset-note {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin: -4px 0 14px;
+            line-height: 1.4;
+            min-height: 1.4em;
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ecc71;
+            margin-right: 4px;
+            vertical-align: middle;
+            animation: live-pulse 2s infinite;
+        }
+
+        .live-dot.stale {
+            background: #f39c12;
+            animation: none;
+        }
+
+        @keyframes live-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.6); }
+            70% { box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+        .trend-up {
+            color: #c0392b;
+            font-weight: 600;
+        }
+
+        .trend-down {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .data-sources {
+            text-align: center;
+            font-size: 0.8em;
+            color: #95a5a6;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .data-sources a {
+            color: #7f8c8d;
+        }
+
         /* Rachel's 2028 Budget Section Styles */
         .reeves-2028-section {
             margin: 30px 0;
@@ -1021,7 +1112,7 @@
 <body>
     <div class="container">
         <h1>EV vs ICE Calculator</h1>
-        <p class="subtitle">Compare fuel costs between electric and internal combustion vehicles</p>
+        <p class="subtitle">Compare running costs of electric and petrol or diesel cars, using live UK prices</p>
 
         <div class="calculator-grid">
             <div class="section ev-section">
@@ -1029,7 +1120,13 @@
                     <span class="icon">⚡</span>
                     Electric Vehicle
                 </h2>
-                
+
+                <div class="preset-row">
+                    <label class="preset-label" for="ev-model-preset">Car</label>
+                    <select id="ev-model-preset" class="preset-select"></select>
+                </div>
+                <p class="preset-note" id="ev-model-note"></p>
+
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Efficiency</span>
@@ -1051,6 +1148,12 @@
                         <input type="range" id="ev-efficiency" min="1" max="10" step="0.1" value="4">
                     </div>
                 </div>
+
+                <div class="preset-row">
+                    <label class="preset-label" for="ev-charging-preset">Charging</label>
+                    <select id="ev-charging-preset" class="preset-select"></select>
+                </div>
+                <p class="preset-note" id="ev-charging-note"></p>
 
                 <div class="slider-group">
                     <div class="slider-label">
@@ -1094,7 +1197,13 @@
                     <span class="icon">⛽</span>
                     Internal Combustion
                 </h2>
-                
+
+                <div class="preset-row">
+                    <label class="preset-label" for="ice-model-preset">Car</label>
+                    <select id="ice-model-preset" class="preset-select"></select>
+                </div>
+                <p class="preset-note" id="ice-model-note"></p>
+
                 <div class="slider-group">
                     <div class="slider-label">
                         <span class="label-text">Efficiency</span>
@@ -1112,6 +1221,12 @@
                         <input type="range" id="petrol-efficiency" min="1" max="200" step="0.1" value="44">
                     </div>
                 </div>
+
+                <div class="preset-row">
+                    <label class="preset-label" for="ice-fuel-preset">Fuel</label>
+                    <select id="ice-fuel-preset" class="preset-select"></select>
+                </div>
+                <p class="preset-note" id="ice-fuel-note"></p>
 
                 <div class="slider-group">
                     <div class="slider-label">
@@ -1186,11 +1301,11 @@
             </button>
 
             <div id="reeves-2028-breakdown" class="reeves-breakdown hidden">
-                <h3 class="reeves-title">Autumn Budget 2025: April 2028 Changes</h3>
+                <h3 class="reeves-title">April 2028: eVED and Fuel Duty Changes</h3>
 
                 <div class="reeves-comparison">
                     <div class="reeves-column reeves-today">
-                        <h4>Today (2025)</h4>
+                        <h4>Today</h4>
                         <div class="reeves-item ev-item">
                             <span class="reeves-label">⚡ EV cost/mile:</span>
                             <span class="reeves-value" id="ev-cost-today">0.00p</span>
@@ -1233,16 +1348,18 @@
                 <div class="reeves-info-box">
                     <p><strong>What changes in 2028?</strong></p>
                     <ul>
-                        <li><strong>EVs:</strong> New road charge of <strong>3p/mile</strong></li>
-                        <li><strong>Fuel:</strong> 5p/litre cut ends + ~3.5p RPI = <strong>+8.5p/litre</strong></li>
+                        <li><strong>EVs:</strong> Electric Vehicle Excise Duty (eVED) of <strong>3p/mile</strong> from 1 April 2028, on top of annual VED</li>
+                        <li><strong>Fuel:</strong> duty is 52.95p/litre until 31 Dec 2026, then 57.95p from March 2027 once the 5p cut is gone. Add about 3.5p of estimated RPI rises by 2028, plus VAT: <strong>about +10.2p/litre</strong> at the pump</li>
                     </ul>
-                    <p class="reeves-source">Source: HM Treasury Autumn Budget 2025</p>
+                    <p class="reeves-source">Sources: GOV.UK eVED policy paper (Jul 2026); Amended Fuel Duty rates 2026 to 2027 (May 2026). The RPI rises are an estimate. Pump prices are otherwise held at today's level.</p>
                 </div>
             </div>
         </div>
 
+        <div class="data-sources" id="data-sources"></div>
+
         <div class="copyright">
-            © 2025 Peter Harding
+            © 2025–2026 Peter Harding
         </div>
     </div>
 
@@ -1253,17 +1370,87 @@
         const KM_PER_MILE = 1.609344; // Exact definition (international mile)
         const MILES_PER_KM = 1 / 1.609344; // Computed from exact mile definition
 
-        // Rachel Reeves' Autumn Budget 2025 - April 2028 changes
-        // Source: HM Treasury Autumn Budget 2025, OBR documents
+        // April 2028 changes: eVED pay-per-mile for EVs, fuel duty back to full rate plus RPI
+        // Sources: GOV.UK eVED policy paper (13 Jul 2026); Amended Fuel Duty rates 2026 to 2027 (22 May 2026)
         const REEVES_2028 = {
-            evRoadCharge: 3.0,           // 3p per mile for EVs
+            evRoadCharge: 3.0,           // 3p per mile for EVs (eVED from 1 April 2028)
             phevRoadCharge: 1.5,         // 1.5p per mile for PHEVs (not used currently)
-            fuelDutyRestoration: 5.0,    // 5p/litre - temporary cut ends
-            fuelDutyRpiIncrease: 3.5,    // ~3.5p/litre estimated RPI increase (2027-2028)
+            fuelDutyToday: 52.95,        // p/litre, 5p cut extended to 31 Dec 2026
+            fuelDutyRestoration: 5.0,    // +3p on 1 Jan 2027, +2p on 1 Mar 2027 → 57.95p
+            fuelDutyRpiIncrease: 3.5,    // estimate: RPI uprating April 2027 and April 2028 (~3% each)
+            vatRate: 0.20,               // VAT is charged on top of duty at the pump
             get totalFuelDutyIncrease() {
-                return this.fuelDutyRestoration + this.fuelDutyRpiIncrease; // ~8.5p/litre total
+                // Pump price rise including VAT: ~10.2p/litre
+                return (this.fuelDutyRestoration + this.fuelDutyRpiIncrease) * (1 + this.vatRate);
             }
         };
+
+        // Real-world EV efficiency, battery-to-wheel (excludes charging losses).
+        // ev-database.org UK "Vehicle consumption" combined figures, September 2026.
+        const EV_MODELS = [
+            { id: 'ev-typical', group: 'Typical', name: 'Typical EV (UK average)', miPerKwh: 3.7, note: 'about 3.1 in winter, 4.3 in summer' },
+            { id: 'tesla-m3', group: 'Tesla', name: 'Tesla Model 3 RWD', miPerKwh: 4.59 },
+            { id: 'tesla-m3-lr', group: 'Tesla', name: 'Tesla Model 3 Long Range', miPerKwh: 4.52 },
+            { id: 'tesla-my', group: 'Tesla', name: 'Tesla Model Y RWD', miPerKwh: 3.92, note: '3.3 in cold weather, 4.5 in mild' },
+            { id: 'tesla-my-lr', group: 'Tesla', name: 'Tesla Model Y Long Range AWD', miPerKwh: 3.73 },
+            { id: 'mini-e', group: 'Small', name: 'Mini Cooper E', miPerKwh: 4.24 },
+            { id: 'renault-5', group: 'Small', name: 'Renault 5 (40 kWh)', miPerKwh: 4.0 },
+            { id: 'peugeot-e208', group: 'Small', name: 'Peugeot e-208', miPerKwh: 3.89 },
+            { id: 'byd-dolphin', group: 'Small', name: 'BYD Dolphin', miPerKwh: 3.56 },
+            { id: 'volvo-ex30', group: 'Small', name: 'Volvo EX30', miPerKwh: 3.46 },
+            { id: 'vw-id3', group: 'Family', name: 'Volkswagen ID.3', miPerKwh: 3.88 },
+            { id: 'polestar-2', group: 'Family', name: 'Polestar 2 Long Range', miPerKwh: 3.73 },
+            { id: 'nissan-leaf', group: 'Family', name: 'Nissan Leaf', miPerKwh: 3.73 },
+            { id: 'kona', group: 'Family', name: 'Hyundai Kona Electric', miPerKwh: 3.66 },
+            { id: 'kia-ev3', group: 'Family', name: 'Kia EV3', miPerKwh: 3.6 },
+            { id: 'mg4', group: 'Family', name: 'MG4', miPerKwh: 3.6 },
+            { id: 'kia-niro', group: 'Family', name: 'Kia Niro EV', miPerKwh: 3.62 },
+            { id: 'bmw-ix1', group: 'SUV', name: 'BMW iX1', miPerKwh: 3.7 },
+            { id: 'audi-q4', group: 'SUV', name: 'Audi Q4 e-tron', miPerKwh: 3.6 },
+            { id: 'skoda-enyaq', group: 'SUV', name: 'Skoda Enyaq', miPerKwh: 3.67 },
+            { id: 'skoda-elroq', group: 'SUV', name: 'Skoda Elroq', miPerKwh: 3.6 },
+            { id: 'vw-id4', group: 'SUV', name: 'Volkswagen ID.4', miPerKwh: 3.6 },
+            { id: 'ford-explorer', group: 'SUV', name: 'Ford Explorer', miPerKwh: 3.52 },
+            { id: 'ioniq-5', group: 'SUV', name: 'Hyundai Ioniq 5', miPerKwh: 3.48 },
+            { id: 'byd-atto3', group: 'SUV', name: 'BYD Atto 3', miPerKwh: 3.47 }
+        ].map(m => ({ ...m, label: m.name }));
+
+        // Real-world mpg from Fuelly owner fill-ups (US mpg × 1.20095 → UK mpg),
+        // vehicle-weighted across recent model years. Fuelly is mostly US owners,
+        // so `note` flags where the data is a different variant from the UK car.
+        const ICE_MODELS = [
+            { id: 'ice-typical', group: 'Typical', name: 'Typical petrol car', mpg: 44, fuel: 'petrol', note: 'rough UK average' },
+            { id: 'yaris-hybrid', group: 'Hybrid', name: 'Toyota Yaris Hybrid', mpg: 62.9, fuel: 'petrol', owners: 18, url: 'https://www.fuelly.com/car/toyota/yaris?submodel_id=62' },
+            { id: 'corolla-hybrid', group: 'Hybrid', name: 'Toyota Corolla Hybrid', mpg: 60.6, fuel: 'petrol', owners: 160, url: 'https://www.fuelly.com/car/toyota/corolla?submodel_id=1275' },
+            { id: 'chr-hybrid', group: 'Hybrid', name: 'Toyota C-HR Hybrid', mpg: 51.4, fuel: 'petrol', owners: 62, url: 'https://www.fuelly.com/car/toyota/c-hr/2017', note: '2017 cars, mostly hybrids' },
+            { id: 'rav4-hybrid', group: 'Hybrid', name: 'Toyota RAV4 Hybrid', mpg: 44.0, fuel: 'petrol', owners: 325, url: 'https://www.fuelly.com/car/toyota/rav4_hybrid/2021', note: 'US cars are all AWD' },
+            { id: 'tucson-hev', group: 'Hybrid', name: 'Hyundai Tucson Hybrid', mpg: 38.2, fuel: 'petrol', owners: 206, url: 'https://www.fuelly.com/car/hyundai/tucson_hybrid/2025', note: 'mostly US AWD cars' },
+            { id: 'sportage-hev', group: 'Hybrid', name: 'Kia Sportage Hybrid', mpg: 37.8, fuel: 'petrol', owners: 33, url: 'https://www.fuelly.com/car/kia/sportage_hybrid/2026', note: 'US cars, same 1.6T hybrid' },
+            { id: 'puma', group: 'Petrol', name: 'Ford Puma', mpg: 45.9, fuel: 'petrol', owners: 14, url: 'https://www.fuelly.com/car/ford/puma/2021', note: 'engines not separated' },
+            { id: 'a3', group: 'Petrol', name: 'Audi A3', mpg: 42.1, fuel: 'petrol', owners: 8, url: 'https://www.fuelly.com/car/audi/a3/2022', note: 'small sample, US 2.0T' },
+            { id: 'golf', group: 'Petrol', name: 'Volkswagen Golf', mpg: 40.6, fuel: 'petrol', owners: 28, url: 'https://www.fuelly.com/car/volkswagen/golf/2021', note: 'mostly US Mk7 1.4T' },
+            { id: 'fiesta', group: 'Petrol', name: 'Ford Fiesta', mpg: 40.1, fuel: 'petrol', owners: 27, url: 'https://www.fuelly.com/car/ford/fiesta/2020', note: '2020–22 cars, engines mixed' },
+            { id: 'polo', group: 'Petrol', name: 'Volkswagen Polo', mpg: 37.9, fuel: 'petrol', owners: 83, url: 'https://www.fuelly.com/car/volkswagen/polo/2018', note: 'engines mixed' },
+            { id: 'sportage', group: 'Petrol', name: 'Kia Sportage', mpg: 36.4, fuel: 'petrol', owners: 305, url: 'https://www.fuelly.com/car/kia/sportage/2023', note: 'US 2.5 petrol, some hybrids included' },
+            { id: 'mini', group: 'Petrol', name: 'Mini Cooper', mpg: 35.7, fuel: 'petrol', owners: 684, url: 'https://www.fuelly.com/car/mini/cooper/2019', note: 'includes Cooper S' },
+            { id: 'evoque', group: 'Petrol', name: 'Range Rover Evoque', mpg: 30.0, fuel: 'petrol', owners: 17, url: 'https://www.fuelly.com/car/land_rover/range_rover_evoque/2020', note: 'mostly US P250' },
+            { id: 'tiguan', group: 'Petrol', name: 'Volkswagen Tiguan', mpg: 29.8, fuel: 'petrol', owners: 709, url: 'https://www.fuelly.com/car/volkswagen/tiguan/2018', note: 'US 2.0T, a UK 1.5 TSI will do better' },
+            { id: 'xc60', group: 'Petrol', name: 'Volvo XC60', mpg: 28.5, fuel: 'petrol', owners: 235, url: 'https://www.fuelly.com/car/volvo/xc60/2019', note: 'US petrol, 2018–21' },
+            { id: 'octavia', group: 'Diesel', name: 'Skoda Octavia', mpg: 48.9, fuel: 'diesel', owners: 22, url: 'https://www.fuelly.com/car/skoda/octavia/2021', note: 'petrol and diesel mixed, diesel likely higher' }
+        ].map(m => ({ ...m, label: m.name }));
+
+        const VEHICLE_DATA_SOURCE = 'ev-database.org real-world consumption; <a href="https://www.fuelly.com" target="_blank" rel="noopener">Fuelly</a> owner fill-ups';
+
+        const DEFAULT_PRESETS = {
+            mode: 'comparison',
+            evModel: 'ev-typical',
+            charging: 'home-cap',
+            iceModel: 'ice-typical',
+            fuel: 'petrol:average'
+        };
+
+        // Snapshot of data/prices.json, used until (or if) the live copy loads
+        const DEFAULT_PRICE_DATA = {"fuelUpdated":"2026-09-25T13:13:01.600Z","fuelSources":[{"brand":"MFG","stations":1225,"updated":"2026-09-25T00:00:01.000Z"},{"brand":"Asda","stations":790,"updated":"2026-09-25T11:04:22.000Z"},{"brand":"Esso","stations":193,"updated":"2026-09-25T00:05:17.000Z"},{"brand":"Moto","stations":47,"updated":"2026-09-25T13:58:05.000Z"},{"brand":"Jet","stations":11,"updated":"2026-09-25T10:45:51.000Z"},{"brand":"Morrisons","stations":1,"updated":"2026-09-24T10:30:19.000Z"}],"fuel":{"petrol":{"average":173.5,"median":173.9,"supermarket":172.9,"motorway":199.9,"cheapest10pc":169.7,"stations":2220},"diesel":{"average":198.4,"median":199.3,"supermarket":197.9,"motorway":219.9,"cheapest10pc":193.9,"stations":2220},"superPetrol":{"average":189.7,"median":189.9,"supermarket":193.9,"motorway":219.9,"cheapest10pc":185.9,"stations":1869},"premiumDiesel":{"average":214.2,"median":215.9,"supermarket":218.9,"motorway":237.9,"cheapest10pc":208.9,"stations":1452}},"fuelHistory":[{"date":"2026-09-06","petrol":164.8,"diesel":186.4},{"date":"2026-09-13","petrol":169.3,"diesel":191.3},{"date":"2026-09-20","petrol":172.2,"diesel":195.9},{"date":"2026-09-25","petrol":173.5,"diesel":198.4}],"electricity":{"updated":"2026-09-25","source":"Ofgem price cap, supplier tariffs, Zapmap Price Index (Aug 2026)","tariffs":[{"id":"home-cap","group":"Home","label":"Standard tariff (price cap): 26.3p","price":26.32,"note":"Ofgem cap 1 Oct – 31 Dec 2026, direct debit, 0% VAT until April 2027"},{"id":"home-iog","group":"Home","label":"Intelligent Octopus Go off-peak: 8.0p","price":8.0,"note":"23:30–05:30 plus extra smart-charging slots"},{"id":"home-edf","group":"Home","label":"EDF GoElectric off-peak: 7.0p","price":6.99,"note":"23:00–06:00"},{"id":"home-eon","group":"Home","label":"E.ON Next Drive Smart off-peak: 8.5p","price":8.5,"note":"00:00–06:00"},{"id":"home-ovo","group":"Home","label":"OVO Charge Anytime: 14p","price":14,"note":"Smart charging at any time, pay-as-you-go add-on"},{"id":"mix-home","group":"Mixed","label":"80% home off-peak + 20% rapid: 21.8p","price":21.8,"note":"Intelligent Octopus Go at home, UK average rapid on trips"},{"id":"mix-nohome","group":"Mixed","label":"No home charger (50% AC, 50% rapid): 65.5p","price":65.5,"note":"UK average public slow/fast and rapid prices"},{"id":"public-ac","group":"Public","label":"Slow/fast, UK average: 54p","price":54,"note":"Zapmap Price Index, August 2026, pay as you go"},{"id":"public-rapid","group":"Public","label":"Rapid/ultra-rapid, UK average: 77p","price":77,"note":"Zapmap Price Index, August 2026. Networks range 59p–92p"},{"id":"instavolt-offpeak","group":"Public","label":"InstaVolt off-peak (app): 55p","price":55,"note":"20:00–07:00 via the InstaVolt app. 92p at other times"},{"id":"tesla-open","group":"Tesla Supercharger","label":"Non-Tesla EVs, average: 63p","price":63,"note":"Zapmap average at Superchargers open to all"},{"id":"tesla-owner","group":"Tesla Supercharger","label":"Tesla owners, average: 46p","price":46,"note":"Zapmap average paid by Tesla drivers"},{"id":"tesla-member-offpeak","group":"Tesla Supercharger","label":"Membership, off-peak: 25p","price":25,"note":"Non-Tesla EVs. Membership about £9.99/month, not included"},{"id":"tesla-member-peak","group":"Tesla Supercharger","label":"Membership, peak: 41p","price":41,"note":"Non-Tesla EVs. Membership about £9.99/month, not included"},{"id":"ionity-passport","group":"Subscriptions","label":"Ionity Passport Power: 49p","price":49,"note":"£10.50/month, not included"},{"id":"bp-pulse","group":"Subscriptions","label":"bp pulse subscription, rapid: 69p","price":69,"note":"£7.85/month, not included. 79p ultra-rapid, 45p AC"},{"id":"gridserve-plus","group":"Subscriptions","label":"GRIDSERVE Plus: ~66p","price":66,"note":"25% off 85–92p for £7.99/month, not included"}]}};
         
         // State
         let state = {
@@ -2128,6 +2315,9 @@
 
                 // Update 2028 breakdown if visible
                 updateReeves2028Breakdown();
+
+                // Show "Custom" for any preset whose value has since changed
+                syncPresetSelects();
             });
         }
 
@@ -2662,10 +2852,333 @@
             toggleReeves2028();
         });
 
+        // ---- Real-world presets and live prices ----
+
+        const PRICE_DATA_URLS = [
+            './data/prices.json',
+            'https://raw.githubusercontent.com/citi94/evcompare/main/data/prices.json'
+        ];
+
+        let priceData = DEFAULT_PRICE_DATA;
+
+        const presetElements = {
+            evModel: document.getElementById('ev-model-preset'),
+            evModelNote: document.getElementById('ev-model-note'),
+            charging: document.getElementById('ev-charging-preset'),
+            chargingNote: document.getElementById('ev-charging-note'),
+            iceModel: document.getElementById('ice-model-preset'),
+            iceModelNote: document.getElementById('ice-model-note'),
+            fuel: document.getElementById('ice-fuel-preset'),
+            fuelNote: document.getElementById('ice-fuel-note'),
+            dataSources: document.getElementById('data-sources')
+        };
+
+        const FUEL_GRADES = {
+            petrol: 'Petrol (E10)',
+            superPetrol: 'Super unleaded (E5)',
+            diesel: 'Diesel',
+            premiumDiesel: 'Premium diesel'
+        };
+
+        const FUEL_TIERS = {
+            average: 'UK average',
+            supermarket: 'supermarket',
+            cheapest10pc: 'cheapest 10%',
+            motorway: 'motorway'
+        };
+
+        // Fuel presets are generated from the live data: "<grade>:<tier>"
+        function getFuelPresets() {
+            const presets = [];
+            for (const [grade, gradeName] of Object.entries(FUEL_GRADES)) {
+                const stats = priceData.fuel && priceData.fuel[grade];
+                if (!stats) continue;
+                const tiers = grade === 'petrol' || grade === 'diesel'
+                    ? Object.keys(FUEL_TIERS)
+                    : ['average'];
+                for (const tier of tiers) {
+                    if (stats[tier] == null) continue;
+                    presets.push({
+                        id: `${grade}:${tier}`,
+                        grade,
+                        group: gradeName,
+                        label: `${gradeName}, ${FUEL_TIERS[tier]}: ${stats[tier].toFixed(1)}p/L`,
+                        price: stats[tier]
+                    });
+                }
+            }
+            return presets;
+        }
+
+        function findPreset(list, id) {
+            return list.find(p => p.id === id);
+        }
+
+        // Fill a <select> with presets grouped by their `group`, keeping the current choice
+        function populatePresetSelect(select, presets, customLabel) {
+            const current = select.value;
+            select.innerHTML = '';
+            select.appendChild(new Option(customLabel, ''));
+            const groups = new Map();
+            for (const p of presets) {
+                if (!groups.has(p.group)) {
+                    const og = document.createElement('optgroup');
+                    og.label = p.group;
+                    groups.set(p.group, og);
+                    select.appendChild(og);
+                }
+                groups.get(p.group).appendChild(new Option(p.label || p.name, p.id));
+            }
+            select.value = findPreset(presets, current) ? current : '';
+        }
+
+        // Current values in the canonical units the presets are defined in
+        function canonicalValue(param) {
+            switch (param) {
+                case 'evEfficiency': return convertEvEfficiency(state.evEfficiency, state.evEfficiencyUnit, 'mi/kWh', true);
+                case 'evCost': return convertEvCost(state.evCost, state.evCostUnit, 'p/kWh', true);
+                case 'petrolEfficiency': return convertFuelEfficiency(state.petrolEfficiency, state.fuelEfficiencyUnit, 'mpgUK', true);
+                case 'petrolCost': return fuelCostToPencePerLitre(state.petrolCost, state.fuelCostUnit);
+            }
+        }
+
+        function fuelCostToPencePerLitre(value, unit) {
+            if (unit === 'galUK') return value / LITRES_PER_UK_GALLON;
+            if (unit === 'galUS') return value / LITRES_PER_US_GALLON;
+            return value;
+        }
+
+        function pencePerLitreToFuelCost(value, unit) {
+            if (unit === 'galUK') return value * LITRES_PER_UK_GALLON;
+            if (unit === 'galUS') return value * LITRES_PER_US_GALLON;
+            return value;
+        }
+
+        function setParamFromCanonical(param, canonical) {
+            let value;
+            switch (param) {
+                case 'evEfficiency': value = convertEvEfficiency(canonical, 'mi/kWh', state.evEfficiencyUnit, true); break;
+                case 'evCost': value = convertEvCost(canonical, 'p/kWh', state.evCostUnit, true); break;
+                case 'petrolEfficiency': value = convertFuelEfficiency(canonical, 'mpgUK', state.fuelEfficiencyUnit, true); break;
+                case 'petrolCost': value = pencePerLitreToFuelCost(canonical, state.fuelCostUnit); break;
+            }
+            state[param] = value;
+            elements[param].value = value;
+        }
+
+        // Presets describe real prices and cars, so comparing them only makes
+        // sense with all four values free: leave equivalence mode first.
+        function applyPreset(param, canonical) {
+            if (state.mode === 'equivalence') toggleMode();
+            setParamFromCanonical(param, canonical);
+            updateLastModified(param);
+            updateDisplays();
+        }
+
+        function formatAge(isoDate) {
+            const hours = (Date.now() - new Date(isoDate).getTime()) / 3600000;
+            if (hours < 1) return 'under an hour ago';
+            if (hours < 24) return `${Math.round(hours)}h ago`;
+            const days = Math.round(hours / 24);
+            return days === 1 ? 'yesterday' : `${days} days ago`;
+        }
+
+        function formatDate(isoDate) {
+            return new Date(isoDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        }
+
+        // "▲ 8.7p since 6 Sep" from the price history, for the grade on show
+        function fuelTrendHtml(grade) {
+            const key = grade.toLowerCase().includes('diesel') ? 'diesel' : 'petrol';
+            const history = (priceData.fuelHistory || []).filter(h => h[key] != null);
+            if (history.length < 2) return '';
+            const latest = history[history.length - 1];
+            const cutoff = new Date(new Date(latest.date).getTime() - 28 * 86400000).toISOString().slice(0, 10);
+            const base = history.find(h => h.date >= cutoff) || history[0];
+            if (base === latest) return '';
+            const change = latest[key] - base[key];
+            if (Math.abs(change) < 0.05) return ` · steady since ${formatDate(base.date)}`;
+            const cls = change > 0 ? 'trend-up' : 'trend-down';
+            const arrow = change > 0 ? '▲' : '▼';
+            return ` · <span class="${cls}">${arrow} ${Math.abs(change).toFixed(1)}p</span> since ${formatDate(base.date)}`;
+        }
+
+        function updatePresetNotes() {
+            const ev = findPreset(EV_MODELS, presetElements.evModel.value);
+            presetElements.evModelNote.textContent = ev
+                ? `Real-world ${ev.miPerKwh.toFixed(1)} mi/kWh${ev.note ? ' · ' + ev.note : ''}`
+                : '';
+
+            const tariff = findPreset(priceData.electricity.tariffs, presetElements.charging.value);
+            presetElements.chargingNote.textContent = tariff ? tariff.note || '' : '';
+
+            const ice = findPreset(ICE_MODELS, presetElements.iceModel.value);
+            if (ice) {
+                const source = ice.url
+                    ? ` · <a href="${ice.url}" target="_blank" rel="noopener">Fuelly</a>, ${ice.owners} owners`
+                    : '';
+                presetElements.iceModelNote.innerHTML =
+                    `Real-world ${ice.mpg.toFixed(1)} mpg (UK) · ${ice.fuel}${source}${ice.note ? ' · ' + ice.note : ''}`;
+            } else {
+                presetElements.iceModelNote.textContent = '';
+            }
+
+            const fuel = findPreset(getFuelPresets(), presetElements.fuel.value);
+            if (fuel && priceData.fuelUpdated) {
+                const ageHours = (Date.now() - new Date(priceData.fuelUpdated).getTime()) / 3600000;
+                const stations = priceData.fuel[fuel.grade].stations;
+                presetElements.fuelNote.innerHTML =
+                    `<span class="live-dot${ageHours > 48 ? ' stale' : ''}"></span>` +
+                    `Live from ${stations.toLocaleString()} forecourts, updated ${formatAge(priceData.fuelUpdated)}` +
+                    fuelTrendHtml(fuel.grade);
+            } else {
+                presetElements.fuelNote.textContent = '';
+            }
+        }
+
+        // Drop a preset back to "Custom" once its value has been changed by hand
+        // or by the equivalence engine
+        function syncPresetSelects() {
+            const checks = [
+                [presetElements.evModel, EV_MODELS, 'evEfficiency', p => p.miPerKwh],
+                [presetElements.charging, priceData.electricity.tariffs, 'evCost', p => p.price],
+                [presetElements.iceModel, ICE_MODELS, 'petrolEfficiency', p => p.mpg],
+                [presetElements.fuel, getFuelPresets(), 'petrolCost', p => p.price]
+            ];
+            for (const [select, list, param, valueOf] of checks) {
+                const preset = findPreset(list, select.value);
+                if (!preset) continue;
+                const expected = valueOf(preset);
+                if (Math.abs(canonicalValue(param) - expected) > expected * 0.002) {
+                    select.value = '';
+                }
+            }
+            updatePresetNotes();
+        }
+
+        function updateDataSources() {
+            const parts = [];
+            if (priceData.fuelUpdated) {
+                const feeds = (priceData.fuelSources || []).map(s => s.brand).join(', ');
+                parts.push(`Fuel: ${feeds ? feeds + ' open data' : 'UK forecourt open data'}, ${formatDate(priceData.fuelUpdated)}`);
+            }
+            if (priceData.electricity.updated) {
+                parts.push(`Electricity: ${priceData.electricity.source}, ${formatDate(priceData.electricity.updated)}`);
+            }
+            parts.push(`Car efficiency: ${VEHICLE_DATA_SOURCE}`);
+            presetElements.dataSources.innerHTML = parts.join('<br>');
+        }
+
+        function populateAllPresets() {
+            populatePresetSelect(presetElements.evModel, EV_MODELS, 'Custom efficiency');
+            populatePresetSelect(presetElements.charging, priceData.electricity.tariffs, 'Custom price');
+            populatePresetSelect(presetElements.iceModel, ICE_MODELS, 'Custom efficiency');
+            populatePresetSelect(presetElements.fuel, getFuelPresets(), 'Custom price');
+            updatePresetNotes();
+            updateDataSources();
+        }
+
+        presetElements.evModel.addEventListener('change', e => {
+            const preset = findPreset(EV_MODELS, e.target.value);
+            if (preset) applyPreset('evEfficiency', preset.miPerKwh);
+            updatePresetNotes();
+        });
+
+        presetElements.charging.addEventListener('change', e => {
+            const preset = findPreset(priceData.electricity.tariffs, e.target.value);
+            if (preset) applyPreset('evCost', preset.price);
+            updatePresetNotes();
+        });
+
+        presetElements.iceModel.addEventListener('change', e => {
+            const preset = findPreset(ICE_MODELS, e.target.value);
+            if (!preset) return updatePresetNotes();
+            applyPreset('petrolEfficiency', preset.mpg);
+
+            // Follow the car's fuel: petrol ↔ diesel at the same price tier
+            const fuelPreset = findPreset(getFuelPresets(), presetElements.fuel.value);
+            if (fuelPreset) {
+                const isDieselCar = preset.fuel === 'diesel';
+                const isDieselFuel = fuelPreset.grade.toLowerCase().includes('diesel');
+                if (isDieselCar !== isDieselFuel) {
+                    const tier = fuelPreset.id.split(':')[1];
+                    const target = findPreset(getFuelPresets(), `${isDieselCar ? 'diesel' : 'petrol'}:${tier}`);
+                    if (target) {
+                        presetElements.fuel.value = target.id;
+                        applyPreset('petrolCost', target.price);
+                    }
+                }
+            }
+            updatePresetNotes();
+        });
+
+        presetElements.fuel.addEventListener('change', e => {
+            const preset = findPreset(getFuelPresets(), e.target.value);
+            if (preset) applyPreset('petrolCost', preset.price);
+            updatePresetNotes();
+        });
+
+        // Fetch the freshest published prices (the deployed copy, or GitHub if newer)
+        async function loadLivePrices() {
+            const results = await Promise.allSettled(PRICE_DATA_URLS.map(url =>
+                fetch(url, { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(r.status))
+            ));
+            const candidates = results
+                .filter(r => r.status === 'fulfilled' && r.value && r.value.fuel)
+                .map(r => r.value);
+            if (!candidates.length) return;
+
+            const newest = candidates.reduce((a, b) =>
+                new Date(b.fuelUpdated || 0) > new Date(a.fuelUpdated || 0) ? b : a);
+            if (new Date(newest.fuelUpdated || 0) <= new Date(priceData.fuelUpdated || 0)
+                && JSON.stringify(newest.electricity) === JSON.stringify(priceData.electricity)) return;
+
+            priceData = {
+                ...newest,
+                electricity: newest.electricity && newest.electricity.tariffs ? newest.electricity : DEFAULT_PRICE_DATA.electricity
+            };
+
+            // Re-apply live presets the user is still on, without touching custom values
+            const fuelId = presetElements.fuel.value;
+            const chargingId = presetElements.charging.value;
+            populateAllPresets();
+            const fuelPreset = findPreset(getFuelPresets(), fuelId);
+            if (fuelPreset) {
+                presetElements.fuel.value = fuelId;
+                setParamFromCanonical('petrolCost', fuelPreset.price);
+            }
+            const tariff = findPreset(priceData.electricity.tariffs, chargingId);
+            if (tariff) {
+                presetElements.charging.value = chargingId;
+                setParamFromCanonical('evCost', tariff.price);
+            }
+            updateDisplays();
+        }
+
+        // Start from real-world defaults: typical cars, home electricity, live pump prices
+        function applyDefaultPresets() {
+            populateAllPresets();
+            const defaults = [
+                [presetElements.evModel, EV_MODELS, 'evEfficiency', DEFAULT_PRESETS.evModel, p => p.miPerKwh],
+                [presetElements.charging, priceData.electricity.tariffs, 'evCost', DEFAULT_PRESETS.charging, p => p.price],
+                [presetElements.iceModel, ICE_MODELS, 'petrolEfficiency', DEFAULT_PRESETS.iceModel, p => p.mpg],
+                [presetElements.fuel, getFuelPresets(), 'petrolCost', DEFAULT_PRESETS.fuel, p => p.price]
+            ];
+            for (const [select, list, param, id, valueOf] of defaults) {
+                const preset = findPreset(list, id);
+                if (!preset) continue;
+                select.value = id;
+                setParamFromCanonical(param, valueOf(preset));
+            }
+            updatePresetNotes();
+        }
+
         // Initialize
         updateSliderRanges();
         updateUsageSliderRange();
-        updateDisplays();
+        applyDefaultPresets();
+        if (DEFAULT_PRESETS.mode === 'comparison') toggleMode(); else updateDisplays();
+        loadLivePrices();
     </script>
 
     <!-- Service Worker Registration -->

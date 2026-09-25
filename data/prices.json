@@ -1,0 +1,216 @@
+{
+  "fuelUpdated": "2026-09-25T13:13:01.600Z",
+  "fuelSources": [
+    {
+      "brand": "MFG",
+      "stations": 1225,
+      "updated": "2026-09-25T00:00:01.000Z"
+    },
+    {
+      "brand": "Asda",
+      "stations": 790,
+      "updated": "2026-09-25T11:04:22.000Z"
+    },
+    {
+      "brand": "Esso",
+      "stations": 193,
+      "updated": "2026-09-25T00:05:17.000Z"
+    },
+    {
+      "brand": "Moto",
+      "stations": 47,
+      "updated": "2026-09-25T13:58:05.000Z"
+    },
+    {
+      "brand": "Jet",
+      "stations": 11,
+      "updated": "2026-09-25T10:45:51.000Z"
+    },
+    {
+      "brand": "Morrisons",
+      "stations": 1,
+      "updated": "2026-09-24T10:30:19.000Z"
+    }
+  ],
+  "fuel": {
+    "petrol": {
+      "average": 173.5,
+      "median": 173.9,
+      "supermarket": 172.9,
+      "motorway": 199.9,
+      "cheapest10pc": 169.7,
+      "stations": 2220
+    },
+    "diesel": {
+      "average": 198.4,
+      "median": 199.3,
+      "supermarket": 197.9,
+      "motorway": 219.9,
+      "cheapest10pc": 193.9,
+      "stations": 2220
+    },
+    "superPetrol": {
+      "average": 189.7,
+      "median": 189.9,
+      "supermarket": 193.9,
+      "motorway": 219.9,
+      "cheapest10pc": 185.9,
+      "stations": 1869
+    },
+    "premiumDiesel": {
+      "average": 214.2,
+      "median": 215.9,
+      "supermarket": 218.9,
+      "motorway": 237.9,
+      "cheapest10pc": 208.9,
+      "stations": 1452
+    }
+  },
+  "fuelHistory": [
+    {
+      "date": "2026-09-06",
+      "petrol": 164.8,
+      "diesel": 186.4
+    },
+    {
+      "date": "2026-09-13",
+      "petrol": 169.3,
+      "diesel": 191.3
+    },
+    {
+      "date": "2026-09-20",
+      "petrol": 172.2,
+      "diesel": 195.9
+    },
+    {
+      "date": "2026-09-25",
+      "petrol": 173.5,
+      "diesel": 198.4
+    }
+  ],
+  "electricity": {
+    "updated": "2026-09-25",
+    "source": "Ofgem price cap, supplier tariffs, Zapmap Price Index (Aug 2026)",
+    "tariffs": [
+      {
+        "id": "home-cap",
+        "group": "Home",
+        "label": "Standard tariff (price cap): 26.3p",
+        "price": 26.32,
+        "note": "Ofgem cap 1 Oct \u2013 31 Dec 2026, direct debit, 0% VAT until April 2027"
+      },
+      {
+        "id": "home-iog",
+        "group": "Home",
+        "label": "Intelligent Octopus Go off-peak: 8.0p",
+        "price": 8.0,
+        "note": "23:30\u201305:30 plus extra smart-charging slots"
+      },
+      {
+        "id": "home-edf",
+        "group": "Home",
+        "label": "EDF GoElectric off-peak: 7.0p",
+        "price": 6.99,
+        "note": "23:00\u201306:00"
+      },
+      {
+        "id": "home-eon",
+        "group": "Home",
+        "label": "E.ON Next Drive Smart off-peak: 8.5p",
+        "price": 8.5,
+        "note": "00:00\u201306:00"
+      },
+      {
+        "id": "home-ovo",
+        "group": "Home",
+        "label": "OVO Charge Anytime: 14p",
+        "price": 14,
+        "note": "Smart charging at any time, pay-as-you-go add-on"
+      },
+      {
+        "id": "mix-home",
+        "group": "Mixed",
+        "label": "80% home off-peak + 20% rapid: 21.8p",
+        "price": 21.8,
+        "note": "Intelligent Octopus Go at home, UK average rapid on trips"
+      },
+      {
+        "id": "mix-nohome",
+        "group": "Mixed",
+        "label": "No home charger (50% AC, 50% rapid): 65.5p",
+        "price": 65.5,
+        "note": "UK average public slow/fast and rapid prices"
+      },
+      {
+        "id": "public-ac",
+        "group": "Public",
+        "label": "Slow/fast, UK average: 54p",
+        "price": 54,
+        "note": "Zapmap Price Index, August 2026, pay as you go"
+      },
+      {
+        "id": "public-rapid",
+        "group": "Public",
+        "label": "Rapid/ultra-rapid, UK average: 77p",
+        "price": 77,
+        "note": "Zapmap Price Index, August 2026. Networks range 59p\u201392p"
+      },
+      {
+        "id": "instavolt-offpeak",
+        "group": "Public",
+        "label": "InstaVolt off-peak (app): 55p",
+        "price": 55,
+        "note": "20:00\u201307:00 via the InstaVolt app. 92p at other times"
+      },
+      {
+        "id": "tesla-open",
+        "group": "Tesla Supercharger",
+        "label": "Non-Tesla EVs, average: 63p",
+        "price": 63,
+        "note": "Zapmap average at Superchargers open to all"
+      },
+      {
+        "id": "tesla-owner",
+        "group": "Tesla Supercharger",
+        "label": "Tesla owners, average: 46p",
+        "price": 46,
+        "note": "Zapmap average paid by Tesla drivers"
+      },
+      {
+        "id": "tesla-member-offpeak",
+        "group": "Tesla Supercharger",
+        "label": "Membership, off-peak: 25p",
+        "price": 25,
+        "note": "Non-Tesla EVs. Membership about \u00a39.99/month, not included"
+      },
+      {
+        "id": "tesla-member-peak",
+        "group": "Tesla Supercharger",
+        "label": "Membership, peak: 41p",
+        "price": 41,
+        "note": "Non-Tesla EVs. Membership about \u00a39.99/month, not included"
+      },
+      {
+        "id": "ionity-passport",
+        "group": "Subscriptions",
+        "label": "Ionity Passport Power: 49p",
+        "price": 49,
+        "note": "\u00a310.50/month, not included"
+      },
+      {
+        "id": "bp-pulse",
+        "group": "Subscriptions",
+        "label": "bp pulse subscription, rapid: 69p",
+        "price": 69,
+        "note": "\u00a37.85/month, not included. 79p ultra-rapid, 45p AC"
+      },
+      {
+        "id": "gridserve-plus",
+        "group": "Subscriptions",
+        "label": "GRIDSERVE Plus: ~66p",
+        "price": 66,
+        "note": "25% off 85\u201392p for \u00a37.99/month, not included"
+      }
+    ]
+  }
+}
