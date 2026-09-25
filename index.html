@@ -358,6 +358,75 @@
             color: var(--muted);
         }
 
+        .shortcut {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            border: 1px solid color-mix(in srgb, var(--ev) 35%, var(--border));
+            border-radius: var(--radius-sm);
+            background: var(--ev-soft);
+            transition: transform 0.1s, border-color 0.15s;
+        }
+
+        .shortcut:hover {
+            border-color: var(--ev);
+        }
+
+        .shortcut:active {
+            transform: scale(0.99);
+        }
+
+        .shortcut .arrow {
+            margin-left: auto;
+            font-size: 1.2em;
+            color: var(--ev);
+        }
+
+        .pick.own {
+            border-style: dashed;
+            color: var(--muted);
+        }
+
+        .own-form {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 12px 14px;
+            margin-bottom: 6px;
+            border: 1px solid var(--ev);
+            border-radius: var(--radius-sm);
+            background: var(--ev-soft);
+            animation: step-in 0.25s ease;
+        }
+
+        .own-form input {
+            width: 7ch;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            font-weight: 700;
+            font-size: 1.05em;
+            text-align: right;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        .own-form input:focus {
+            border-color: var(--ev);
+            box-shadow: var(--focus);
+        }
+
+        .own-form .primary-btn {
+            margin-left: auto;
+            padding: 8px 16px;
+        }
+
         .pick-value {
             font-size: 0.85em;
             color: var(--muted);
@@ -745,7 +814,9 @@
         }
 
         .num::-webkit-outer-spin-button,
-        .num::-webkit-inner-spin-button {
+        .num::-webkit-inner-spin-button,
+        .own-form input::-webkit-outer-spin-button,
+        .own-form input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
@@ -1082,7 +1153,7 @@
             <div class="step-body" id="step-body"></div>
             <div class="wizard-nav">
                 <button class="link-btn" id="wizard-back">← Back</button>
-                <button class="link-btn" id="wizard-skip">Skip to results</button>
+                <button class="link-btn" id="wizard-skip">Skip questions</button>
                 <button class="primary-btn" id="wizard-next" hidden>See results</button>
             </div>
         </section>
@@ -1322,23 +1393,57 @@
             { id: 'rav4-hybrid', group: 'Hybrid', name: 'Toyota RAV4 Hybrid AWD', mpg: 44.1, fuel: 'petrol', owners: 300, url: 'https://www.fuelly.com/car/toyota/rav4_hybrid' },
             { id: 'sportage-hev', group: 'Hybrid', name: 'Kia Sportage Hybrid AWD', mpg: 38.2, fuel: 'petrol', owners: 41, url: 'https://www.fuelly.com/car/kia/sportage_hybrid' },
             { id: 'tucson-hev', group: 'Hybrid', name: 'Hyundai Tucson Hybrid AWD', mpg: 37.7, fuel: 'petrol', owners: 105, url: 'https://www.fuelly.com/car/hyundai/tucson_hybrid' },
-            { id: 'vw-up', group: 'Petrol', name: 'Volkswagen up! 1.0', mpg: 50.8, fuel: 'petrol', owners: 37, url: 'https://www.fuelly.com/car/volkswagen/up?engineconfig_id=477' },
-            { id: 'aygo', group: 'Petrol', name: 'Toyota Aygo 1.0', mpg: 49.2, fuel: 'petrol', owners: 22, url: 'https://www.fuelly.com/car/toyota/aygo?engineconfig_id=477' },
-            { id: 'i10', group: 'Petrol', name: 'Hyundai i10 1.0', mpg: 48.5, fuel: 'petrol', owners: 11, url: 'https://www.fuelly.com/car/hyundai/i10?engineconfig_id=477' },
-            { id: 'puma', group: 'Petrol', name: 'Ford Puma 1.0 EcoBoost', mpg: 44.8, fuel: 'petrol', owners: 18, url: 'https://www.fuelly.com/car/ford/puma' },
             { id: 'fiesta', group: 'Petrol', name: 'Ford Fiesta 1.0 EcoBoost', mpg: 42.9, fuel: 'petrol', owners: 234, url: 'https://www.fuelly.com/car/ford/fiesta?engineconfig_id=105' },
-            { id: 'peugeot-208', group: 'Petrol', name: 'Peugeot 208 1.2 PureTech', mpg: 42.5, fuel: 'petrol', owners: 45, url: 'https://www.fuelly.com/car/peugeot/208?engineconfig_id=16' },
-            { id: 'polo', group: 'Petrol', name: 'Volkswagen Polo 1.0', mpg: 41.5, fuel: 'petrol', owners: 23, url: 'https://www.fuelly.com/car/volkswagen/polo?engineconfig_id=477' },
             { id: 'focus', group: 'Petrol', name: 'Ford Focus 1.0 EcoBoost', mpg: 40.9, fuel: 'petrol', owners: 200, url: 'https://www.fuelly.com/car/ford/focus?engineconfig_id=105' },
-            { id: 'golf', group: 'Petrol', name: 'Volkswagen Golf 1.4 TSI', mpg: 39.8, fuel: 'petrol', owners: 153, url: 'https://www.fuelly.com/car/volkswagen/golf?engineconfig_id=28' },
+            { id: 'puma', group: 'Petrol', name: 'Ford Puma 1.0 EcoBoost', mpg: 44.8, fuel: 'petrol', owners: 18, url: 'https://www.fuelly.com/car/ford/puma' },
+            { id: 'i10', group: 'Petrol', name: 'Hyundai i10 1.0', mpg: 48.5, fuel: 'petrol', owners: 11, url: 'https://www.fuelly.com/car/hyundai/i10?engineconfig_id=477' },
             { id: 'mini', group: 'Petrol', name: 'Mini Cooper 1.5', mpg: 38.7, fuel: 'petrol', owners: 222, url: 'https://www.fuelly.com/car/mini/cooper?engineconfig_id=733' },
+            { id: 'peugeot-208', group: 'Petrol', name: 'Peugeot 208 1.2 PureTech', mpg: 42.5, fuel: 'petrol', owners: 45, url: 'https://www.fuelly.com/car/peugeot/208?engineconfig_id=16' },
+            { id: 'aygo', group: 'Petrol', name: 'Toyota Aygo 1.0', mpg: 49.2, fuel: 'petrol', owners: 22, url: 'https://www.fuelly.com/car/toyota/aygo?engineconfig_id=477' },
+            { id: 'golf', group: 'Petrol', name: 'Volkswagen Golf 1.4 TSI', mpg: 39.8, fuel: 'petrol', owners: 153, url: 'https://www.fuelly.com/car/volkswagen/golf?engineconfig_id=28' },
+            { id: 'polo', group: 'Petrol', name: 'Volkswagen Polo 1.0', mpg: 41.5, fuel: 'petrol', owners: 23, url: 'https://www.fuelly.com/car/volkswagen/polo?engineconfig_id=477' },
             { id: 'tiguan', group: 'Petrol', name: 'Volkswagen Tiguan 2.0 TSI', mpg: 29.8, fuel: 'petrol', owners: 709, url: 'https://www.fuelly.com/car/volkswagen/tiguan/2018' },
-            { id: 'golf-tdi', group: 'Diesel', name: 'Volkswagen Golf 2.0 TDI', mpg: 47.7, fuel: 'diesel', owners: 933, url: 'https://www.fuelly.com/car/volkswagen/golf?engineconfig_id=103' },
-            { id: 'focus-tdci', group: 'Diesel', name: 'Ford Focus TDCi', mpg: 46.9, fuel: 'diesel', owners: 113, url: 'https://www.fuelly.com/car/ford/focus?engineconfig_id=501' },
-            { id: 'octavia-tdi', group: 'Diesel', name: 'Skoda Octavia TDI', mpg: 46.8, fuel: 'diesel', owners: 125, url: 'https://www.fuelly.com/car/skoda/octavia?engineconfig_id=501' },
-            { id: 'qashqai-dci', group: 'Diesel', name: 'Nissan Qashqai dCi', mpg: 46.6, fuel: 'diesel', owners: 34, url: 'https://www.fuelly.com/car/nissan/qashqai?engineconfig_id=501' },
+            { id: 'vw-up', group: 'Petrol', name: 'Volkswagen up! 1.0', mpg: 50.8, fuel: 'petrol', owners: 37, url: 'https://www.fuelly.com/car/volkswagen/up?engineconfig_id=477' },
+            { id: 'a3-tdi', group: 'Diesel', name: 'Audi A3 TDI', mpg: 44.7, fuel: 'diesel', owners: 150, url: 'https://www.fuelly.com/car/audi/a3?engineconfig_id=103' },
+            { id: 'a4-tdi', group: 'Diesel', name: 'Audi A4 2.0 TDI', mpg: 42.1, fuel: 'diesel', owners: 120, url: 'https://www.fuelly.com/car/audi/a4?engineconfig_id=103' },
+            { id: 'a6-tdi', group: 'Diesel', name: 'Audi A6 2.0 TDI', mpg: 42.6, fuel: 'diesel', owners: 31, url: 'https://www.fuelly.com/car/audi/a6?engineconfig_id=501' },
+            { id: 'q5-tdi', group: 'Diesel', name: 'Audi Q5 TDI', mpg: 33.3, fuel: 'diesel', owners: 22, url: 'https://www.fuelly.com/car/audi/q5?engineconfig_id=103' },
+            { id: 'bmw-118d', group: 'Diesel', name: 'BMW 118d', mpg: 47.0, fuel: 'diesel', owners: 32, url: 'https://www.fuelly.com/car/bmw/118d?engineconfig_id=501' },
             { id: 'bmw-320d', group: 'Diesel', name: 'BMW 320d', mpg: 44.7, fuel: 'diesel', owners: 69, url: 'https://www.fuelly.com/car/bmw/320d?engineconfig_id=501' },
-            { id: 'ceed-crdi', group: 'Diesel', name: 'Kia Ceed CRDi', mpg: 44.0, fuel: 'diesel', owners: 12, url: 'https://www.fuelly.com/car/kia/ceed?engineconfig_id=501' }
+            { id: 'bmw-520d', group: 'Diesel', name: 'BMW 520d', mpg: 41.3, fuel: 'diesel', owners: 96, url: 'https://www.fuelly.com/car/bmw/520d?engineconfig_id=501' },
+            { id: 'bmw-x3-20d', group: 'Diesel', name: 'BMW X3 20d', mpg: 36.0, fuel: 'diesel', owners: 91, url: 'https://www.fuelly.com/car/bmw/x3?engineconfig_id=103' },
+            { id: 'fiesta-tdci', group: 'Diesel', name: 'Ford Fiesta TDCi', mpg: 52.9, fuel: 'diesel', owners: 93, url: 'https://www.fuelly.com/car/ford/fiesta?engineconfig_id=501' },
+            { id: 'focus-tdci', group: 'Diesel', name: 'Ford Focus TDCi', mpg: 46.9, fuel: 'diesel', owners: 113, url: 'https://www.fuelly.com/car/ford/focus?engineconfig_id=501' },
+            { id: 'kuga-tdci', group: 'Diesel', name: 'Ford Kuga TDCi', mpg: 37.4, fuel: 'diesel', owners: 35, url: 'https://www.fuelly.com/car/ford/kuga?engineconfig_id=501' },
+            { id: 'mondeo-tdci', group: 'Diesel', name: 'Ford Mondeo TDCi', mpg: 42.8, fuel: 'diesel', owners: 53, url: 'https://www.fuelly.com/car/ford/mondeo?engineconfig_id=501' },
+            { id: 'civic-idtec', group: 'Diesel', name: 'Honda Civic i-DTEC', mpg: 56.5, fuel: 'diesel', owners: 48, url: 'https://www.fuelly.com/car/honda/civic?engineconfig_id=501' },
+            { id: 'tucson-crdi', group: 'Diesel', name: 'Hyundai Tucson CRDi', mpg: 37.6, fuel: 'diesel', owners: 13, url: 'https://www.fuelly.com/car/hyundai/tucson?engineconfig_id=501' },
+            { id: 'ceed-crdi', group: 'Diesel', name: 'Kia Ceed CRDi', mpg: 44.0, fuel: 'diesel', owners: 12, url: 'https://www.fuelly.com/car/kia/ceed?engineconfig_id=501' },
+            { id: 'sportage-crdi', group: 'Diesel', name: 'Kia Sportage CRDi', mpg: 37.0, fuel: 'diesel', owners: 56, url: 'https://www.fuelly.com/car/kia/sportage?engineconfig_id=501' },
+            { id: 'mazda6-diesel', group: 'Diesel', name: 'Mazda 6 2.2d', mpg: 40.7, fuel: 'diesel', owners: 31, url: 'https://www.fuelly.com/car/mazda/6?engineconfig_id=501' },
+            { id: 'cx5-diesel', group: 'Diesel', name: 'Mazda CX-5 2.2d', mpg: 35.9, fuel: 'diesel', owners: 85, url: 'https://www.fuelly.com/car/mazda/cx-5?engineconfig_id=89' },
+            { id: 'c220d', group: 'Diesel', name: 'Mercedes C220d', mpg: 39.3, fuel: 'diesel', owners: 46, url: 'https://www.fuelly.com/car/mercedes-benz/c220?engineconfig_id=501' },
+            { id: 'qashqai-dci', group: 'Diesel', name: 'Nissan Qashqai dCi', mpg: 46.6, fuel: 'diesel', owners: 34, url: 'https://www.fuelly.com/car/nissan/qashqai?engineconfig_id=501' },
+            { id: 'peugeot-3008-hdi', group: 'Diesel', name: 'Peugeot 3008 BlueHDi', mpg: 37.8, fuel: 'diesel', owners: 19, url: 'https://www.fuelly.com/car/peugeot/3008?engineconfig_id=501' },
+            { id: 'peugeot-308-hdi', group: 'Diesel', name: 'Peugeot 308 BlueHDi', mpg: 50.2, fuel: 'diesel', owners: 49, url: 'https://www.fuelly.com/car/peugeot/308?engineconfig_id=501' },
+            { id: 'evoque-diesel', group: 'Diesel', name: 'Range Rover Evoque diesel', mpg: 36.0, fuel: 'diesel', owners: 47, url: 'https://www.fuelly.com/car/land_rover/range_rover_evoque?engineconfig_id=501' },
+            { id: 'leon-tdi', group: 'Diesel', name: 'SEAT Leon TDI', mpg: 48.3, fuel: 'diesel', owners: 93, url: 'https://www.fuelly.com/car/seat/leon?engineconfig_id=103' },
+            { id: 'octavia-tdi', group: 'Diesel', name: 'Skoda Octavia TDI', mpg: 46.8, fuel: 'diesel', owners: 125, url: 'https://www.fuelly.com/car/skoda/octavia?engineconfig_id=501' },
+            { id: 'superb-tdi', group: 'Diesel', name: 'Skoda Superb TDI', mpg: 43.9, fuel: 'diesel', owners: 126, url: 'https://www.fuelly.com/car/skoda/superb?engineconfig_id=501' },
+            { id: 'astra-cdti', group: 'Diesel', name: 'Vauxhall Astra CDTi', mpg: 45.1, fuel: 'diesel', owners: 47, url: 'https://www.fuelly.com/car/vauxhall/astra?engineconfig_id=501' },
+            { id: 'insignia-cdti', group: 'Diesel', name: 'Vauxhall Insignia CDTi', mpg: 50.6, fuel: 'diesel', owners: 33, url: 'https://www.fuelly.com/car/vauxhall/insignia?engineconfig_id=501' },
+            { id: 'golf-tdi', group: 'Diesel', name: 'Volkswagen Golf 2.0 TDI', mpg: 47.7, fuel: 'diesel', owners: 933, url: 'https://www.fuelly.com/car/volkswagen/golf?engineconfig_id=103' },
+            { id: 'passat-tdi', group: 'Diesel', name: 'Volkswagen Passat 2.0 TDI', mpg: 46.5, fuel: 'diesel', owners: 2372, url: 'https://www.fuelly.com/car/volkswagen/passat?engineconfig_id=103' },
+            { id: 'polo-tdi', group: 'Diesel', name: 'Volkswagen Polo TDI', mpg: 51.0, fuel: 'diesel', owners: 58, url: 'https://www.fuelly.com/car/volkswagen/polo?engineconfig_id=500' },
+            { id: 'tiguan-tdi', group: 'Diesel', name: 'Volkswagen Tiguan TDI', mpg: 37.2, fuel: 'diesel', owners: 110, url: 'https://www.fuelly.com/car/volkswagen/tiguan?engineconfig_id=103' },
+            { id: 'v40-diesel', group: 'Diesel', name: 'Volvo V40 diesel', mpg: 52.0, fuel: 'diesel', owners: 52, url: 'https://www.fuelly.com/car/volvo/v40?engineconfig_id=501' },
+            { id: 'xc60-d4', group: 'Diesel', name: 'Volvo XC60 D4', mpg: 37.2, fuel: 'diesel', owners: 24, url: 'https://www.fuelly.com/car/volvo/xc60?engineconfig_id=501' },
+            { id: 'ranger', group: 'Pick-ups & vans', name: 'Ford Ranger', mpg: 26.2, fuel: 'diesel', owners: 322, url: 'https://www.fuelly.com/car/ford/ranger?engineconfig_id=501' },
+            { id: 'transit-custom', group: 'Pick-ups & vans', name: 'Ford Transit Custom', mpg: 29.8, fuel: 'diesel', owners: 47, url: 'https://www.fuelly.com/car/ford/transit_custom?engineconfig_id=89' },
+            { id: 'l200', group: 'Pick-ups & vans', name: 'Mitsubishi L200', mpg: 27.1, fuel: 'diesel', owners: 63, url: 'https://www.fuelly.com/car/mitsubishi/l200?engineconfig_id=101' },
+            { id: 'navara', group: 'Pick-ups & vans', name: 'Nissan Navara', mpg: 26.5, fuel: 'diesel', owners: 40, url: 'https://www.fuelly.com/car/nissan/navara?engineconfig_id=99' },
+            { id: 'hilux', group: 'Pick-ups & vans', name: 'Toyota Hilux', mpg: 26.4, fuel: 'diesel', owners: 101, url: 'https://www.fuelly.com/car/toyota/hilux?engineconfig_id=501' },
+            { id: 'transporter-tdi', group: 'Pick-ups & vans', name: 'Volkswagen Transporter TDI', mpg: 31.2, fuel: 'diesel', owners: 172, url: 'https://www.fuelly.com/car/volkswagen/transporter?engineconfig_id=103' }
         ].map(m => ({ ...m, label: m.name }));
 
         const VEHICLE_DATA_SOURCE = 'ev-database.org real-world consumption; <a href="https://www.fuelly.com" target="_blank" rel="noopener">Fuelly</a> owner fill-ups';
@@ -1596,6 +1701,18 @@
             if (!preset) return;
             state.presets.fuel = id;
             state.pPerLitre = preset.price;
+            state.fuelType = isDieselGrade(preset.grade) ? 'diesel' : 'petrol';
+        }
+
+        // A car that isn't in the list: the user's own economy and fuel
+        function setOwnIce(mpg, fuel) {
+            state.presets.ice = '';
+            state.mpg = mpg;
+            const current = findPreset(getFuelPresets(), state.presets.fuel);
+            if (current && isDieselGrade(current.grade) !== (fuel === 'diesel')) {
+                selectFuel(`${fuel}:${current.tier}`);
+            }
+            state.fuelType = fuel;
         }
 
         // ---------- Wizard ----------
@@ -1606,10 +1723,28 @@
             {
                 title: 'What do you drive now?',
                 sub: 'Or the petrol or diesel car you’d buy instead.',
-                render: () => pickList(ICE_MODELS, state.presets.ice, car => ({
-                    icon: car.fuel === 'diesel' ? '🛢️' : '⛽',
-                    value: iceEffText(car.mpg)
-                }), id => { selectIce(id); nextStep(); })
+                render: () => {
+                    const wrap = document.createElement('div');
+                    const shortcut = document.createElement('button');
+                    shortcut.className = 'shortcut';
+                    shortcut.innerHTML = '<span class="pick-icon">✍️</span>' +
+                        '<span class="pick-name">I know my numbers<span class="pick-desc">Skip the questions and enter everything yourself</span></span>' +
+                        '<span class="arrow">→</span>';
+                    shortcut.addEventListener('click', skipToOwnNumbers);
+                    wrap.appendChild(shortcut);
+                    wrap.appendChild(pickList(ICE_MODELS, state.presets.ice, car => ({
+                        icon: car.fuel === 'diesel' ? '🛢️' : '⛽',
+                        value: iceEffText(car.mpg)
+                    }), id => { selectIce(id); nextStep(); }, {
+                        label: `Enter your own ${state.units.fuelEff}`,
+                        unit: () => FUEL_EFF_UNITS[state.units.fuelEff],
+                        unitName: () => state.units.fuelEff,
+                        current: () => state.mpg,
+                        fuelToggle: true,
+                        apply: (mpg, fuel) => { setOwnIce(mpg, fuel); nextStep(); }
+                    }));
+                    return wrap;
+                }
             },
             {
                 title: 'Which electric car?',
@@ -1617,7 +1752,13 @@
                 render: () => pickList(EV_MODELS, state.presets.ev, car => ({
                     icon: '⚡',
                     value: evEffText(car.miPerKwh)
-                }), id => { selectEv(id); nextStep(); })
+                }), id => { selectEv(id); nextStep(); }, {
+                    label: `Enter your own ${state.units.evEff}`,
+                    unit: () => EV_EFF_UNITS[state.units.evEff],
+                    unitName: () => state.units.evEff,
+                    current: () => state.miPerKwh,
+                    apply: miPerKwh => { state.presets.ev = ''; state.miPerKwh = miPerKwh; nextStep(); }
+                })
             },
             {
                 title: 'Where would you charge?',
@@ -1642,7 +1783,41 @@
 
         let stepIndex = 0;
 
-        function pickList(items, selectedId, describe, onPick) {
+        // Inline form for a figure that isn't in the list
+        function ownValueRow(own, isCustom) {
+            const holder = document.createElement('div');
+            const collapsed = document.createElement('button');
+            collapsed.className = 'pick own';
+            collapsed.setAttribute('aria-pressed', isCustom);
+            collapsed.innerHTML = `<span class="pick-icon">✏️</span><span class="pick-name">${own.label}</span>`;
+            holder.appendChild(collapsed);
+
+            collapsed.addEventListener('click', () => {
+                const u = own.unit();
+                let fuel = state.fuelType;
+                const form = document.createElement('form');
+                form.className = 'own-form';
+                form.innerHTML = `<input type="number" inputmode="decimal" step="any" required aria-label="${own.label}" value="${u.to(own.current()).toFixed(u.dp)}">` +
+                    `<span class="unit">${own.unitName()}</span>` +
+                    (own.fuelToggle ? '<div class="segmented"><button type="button" data-fuel="petrol">Petrol</button><button type="button" data-fuel="diesel">Diesel</button></div>' : '') +
+                    '<button class="primary-btn" type="submit">Use</button>';
+                const syncFuel = () => form.querySelectorAll('[data-fuel]').forEach(b => b.setAttribute('aria-pressed', b.dataset.fuel === fuel));
+                form.querySelectorAll('[data-fuel]').forEach(b => b.addEventListener('click', () => { fuel = b.dataset.fuel; syncFuel(); }));
+                syncFuel();
+                form.addEventListener('submit', e => {
+                    e.preventDefault();
+                    const v = parseFloat(form.querySelector('input').value);
+                    if (v > 0) own.apply(u.from(v), fuel);
+                });
+                holder.replaceChildren(form);
+                const input = form.querySelector('input');
+                input.focus();
+                input.select();
+            });
+            return holder;
+        }
+
+        function pickList(items, selectedId, describe, onPick, own) {
             const wrap = document.createElement('div');
             const search = document.createElement('input');
             search.className = 'search';
@@ -1655,9 +1830,10 @@
             function draw() {
                 const q = search.value.trim().toLowerCase();
                 list.innerHTML = '';
+                if (own && !q) list.appendChild(ownValueRow(own, !selectedId));
                 let lastGroup = null;
                 for (const item of items) {
-                    if (q && !item.name.toLowerCase().includes(q)) continue;
+                    if (q && !`${item.name} ${item.group} ${item.fuel || ''}`.toLowerCase().includes(q)) continue;
                     if (item.group !== lastGroup) {
                         const g = document.createElement('div');
                         g.className = 'pick-group';
@@ -1676,7 +1852,7 @@
                     list.appendChild(btn);
                 }
                 if (!list.children.length) {
-                    list.innerHTML = '<p class="step-sub">No match. Pick the closest, then adjust it later.</p>';
+                    list.innerHTML = '<p class="step-sub">No match. Pick the closest, or clear the search and enter your own figure.</p>';
                 }
             }
 
@@ -1801,6 +1977,12 @@
             $('restart-btn').hidden = true;
             showStep(0);
             window.scrollTo({ top: 0 });
+        }
+
+        function skipToOwnNumbers() {
+            finishWizard();
+            const target = document.querySelector('.section-title');
+            window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
         }
 
         function finishWizard() {
