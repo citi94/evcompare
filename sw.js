@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ev-calculator-v2.0.0';
+const CACHE_NAME = 'ev-calculator-v3.0.0';
 const urlsToCache = [
   './',
   './index.html',

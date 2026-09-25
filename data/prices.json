@@ -97,14 +97,14 @@
         "group": "Home",
         "label": "Standard tariff (price cap): 26.3p",
         "price": 26.32,
-        "note": "Ofgem cap 1 Oct \u2013 31 Dec 2026, direct debit, 0% VAT until April 2027"
+        "note": "Ofgem cap, Oct\u2013Dec 2026"
       },
       {
         "id": "home-iog",
         "group": "Home",
         "label": "Intelligent Octopus Go off-peak: 8.0p",
         "price": 8.0,
-        "note": "23:30\u201305:30 plus extra smart-charging slots"
+        "note": "23:30\u201305:30"
       },
       {
         "id": "home-edf",
@@ -125,91 +125,91 @@
         "group": "Home",
         "label": "OVO Charge Anytime: 14p",
         "price": 14,
-        "note": "Smart charging at any time, pay-as-you-go add-on"
+        "note": "Any time, smart charging"
       },
       {
         "id": "mix-home",
         "group": "Mixed",
         "label": "80% home off-peak + 20% rapid: 21.8p",
         "price": 21.8,
-        "note": "Intelligent Octopus Go at home, UK average rapid on trips"
+        "note": ""
       },
       {
         "id": "mix-nohome",
         "group": "Mixed",
         "label": "No home charger (50% AC, 50% rapid): 65.5p",
         "price": 65.5,
-        "note": "UK average public slow/fast and rapid prices"
+        "note": ""
       },
       {
         "id": "public-ac",
         "group": "Public",
         "label": "Slow/fast, UK average: 54p",
         "price": 54,
-        "note": "Zapmap Price Index, August 2026, pay as you go"
+        "note": "Zapmap, Aug 2026"
       },
       {
         "id": "public-rapid",
         "group": "Public",
         "label": "Rapid/ultra-rapid, UK average: 77p",
         "price": 77,
-        "note": "Zapmap Price Index, August 2026. Networks range 59p\u201392p"
+        "note": "Zapmap, Aug 2026"
       },
       {
         "id": "instavolt-offpeak",
         "group": "Public",
         "label": "InstaVolt off-peak (app): 55p",
         "price": 55,
-        "note": "20:00\u201307:00 via the InstaVolt app. 92p at other times"
+        "note": "20:00\u201307:00, via app"
       },
       {
         "id": "tesla-open",
         "group": "Tesla Supercharger",
         "label": "Non-Tesla EVs, average: 63p",
         "price": 63,
-        "note": "Zapmap average at Superchargers open to all"
+        "note": "Zapmap, Aug 2026"
       },
       {
         "id": "tesla-owner",
         "group": "Tesla Supercharger",
         "label": "Tesla owners, average: 46p",
         "price": 46,
-        "note": "Zapmap average paid by Tesla drivers"
+        "note": "Zapmap, Aug 2026"
       },
       {
         "id": "tesla-member-offpeak",
         "group": "Tesla Supercharger",
         "label": "Membership, off-peak: 25p",
         "price": 25,
-        "note": "Non-Tesla EVs. Membership about \u00a39.99/month, not included"
+        "note": "+ \u00a39.99/month"
       },
       {
         "id": "tesla-member-peak",
         "group": "Tesla Supercharger",
         "label": "Membership, peak: 41p",
         "price": 41,
-        "note": "Non-Tesla EVs. Membership about \u00a39.99/month, not included"
+        "note": "+ \u00a39.99/month"
       },
       {
         "id": "ionity-passport",
         "group": "Subscriptions",
         "label": "Ionity Passport Power: 49p",
         "price": 49,
-        "note": "\u00a310.50/month, not included"
+        "note": "+ \u00a310.50/month"
       },
       {
         "id": "bp-pulse",
         "group": "Subscriptions",
         "label": "bp pulse subscription, rapid: 69p",
         "price": 69,
-        "note": "\u00a37.85/month, not included. 79p ultra-rapid, 45p AC"
+        "note": "+ \u00a37.85/month"
       },
       {
         "id": "gridserve-plus",
         "group": "Subscriptions",
         "label": "GRIDSERVE Plus: ~66p",
         "price": 66,
-        "note": "25% off 85\u201392p for \u00a37.99/month, not included"
+        "note": "+ \u00a37.99/month"
       }
     ]
   }

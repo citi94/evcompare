@@ -1,10 +1,10 @@
 {
-  "name": "EV vs ICE Cost Calculator",
+  "name": "EV Compare",
   "short_name": "EV Compare",
-  "description": "Compare fuel costs between Electric Vehicles and Internal Combustion Engine vehicles",
+  "description": "What an electric car would cost you to run compared with petrol or diesel, using live UK prices",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f5f7fa",
+  "background_color": "#f4f5f7",
   "theme_color": "#3498db",
   "orientation": "portrait-primary",
   "scope": "./",
