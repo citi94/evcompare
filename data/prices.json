@@ -1,48 +1,48 @@
 {
-  "fuelUpdated": "2026-09-29T12:49:43.182Z",
+  "fuelUpdated": "2026-09-30T12:31:56.461Z",
   "fuelSources": [
     {
       "brand": "MFG",
       "stations": 1225,
-      "updated": "2026-09-29T00:00:01.000Z"
+      "updated": "2026-09-30T00:00:01.000Z"
     },
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-09-29T10:07:34.000Z"
+      "updated": "2026-09-30T10:10:18.000Z"
     },
     {
       "brand": "Esso",
       "stations": 193,
-      "updated": "2026-09-29T03:02:56.000Z"
+      "updated": "2026-09-30T00:05:13.000Z"
     },
     {
       "brand": "Moto",
       "stations": 47,
-      "updated": "2026-09-29T09:58:05.000Z"
+      "updated": "2026-09-30T09:58:04.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-09-29T10:45:51.000Z"
+      "updated": "2026-09-30T10:45:51.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-09-28T10:30:24.000Z"
+      "updated": "2026-09-29T10:30:22.000Z"
     }
   ],
   "fuel": {
     "petrol": {
-      "average": 174.5,
+      "average": 174.6,
       "median": 174.9,
       "supermarket": 174.7,
       "motorway": 199.9,
-      "cheapest10pc": 170.9,
+      "cheapest10pc": 171.7,
       "stations": 2220
     },
     "diesel": {
-      "average": 199.8,
+      "average": 200,
       "median": 199.9,
       "supermarket": 199.9,
       "motorway": 219.9,
@@ -50,7 +50,7 @@
       "stations": 2220
     },
     "superPetrol": {
-      "average": 193.3,
+      "average": 193.4,
       "median": 194.9,
       "supermarket": 193.9,
       "motorway": 219.9,
@@ -58,11 +58,11 @@
       "stations": 1869
     },
     "premiumDiesel": {
-      "average": 217.1,
+      "average": 217.2,
       "median": 219.9,
       "supermarket": 218.9,
       "motorway": 239.9,
-      "cheapest10pc": 210.9,
+      "cheapest10pc": 211.9,
       "stations": 1452
     }
   },
@@ -106,6 +106,11 @@
       "date": "2026-09-29",
       "petrol": 174.5,
       "diesel": 199.8
+    },
+    {
+      "date": "2026-09-30",
+      "petrol": 174.6,
+      "diesel": 200
     }
   ],
   "electricity": {
