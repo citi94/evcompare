@@ -1,5 +1,5 @@
 {
-  "fuelUpdated": "2026-10-06T13:16:27.781Z",
+  "fuelUpdated": "2026-10-06T20:17:41.486Z",
   "fuelSources": [
     {
       "brand": "MFG",
@@ -19,7 +19,7 @@
     {
       "brand": "Moto",
       "stations": 47,
-      "updated": "2026-10-06T13:58:06.000Z"
+      "updated": "2026-10-06T17:58:05.000Z"
     },
     {
       "brand": "Jet",
@@ -29,7 +29,7 @@
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-10-05T10:30:19.000Z"
+      "updated": "2026-10-06T10:30:23.000Z"
     }
   ],
   "fuel": {
@@ -37,7 +37,7 @@
       "average": 174.9,
       "median": 174.9,
       "supermarket": 173.9,
-      "motorway": 197.9,
+      "motorway": 195.9,
       "cheapest10pc": 171.9,
       "stations": 2221
     },
@@ -53,7 +53,7 @@
       "average": 193.4,
       "median": 194.9,
       "supermarket": 193.9,
-      "motorway": 217.9,
+      "motorway": 215.9,
       "cheapest10pc": 189.9,
       "stations": 1870
     },
