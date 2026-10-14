@@ -1,0 +1,5 @@
+# Skip deploys when only the auto-updated price data changed. The page
+# fetches data/prices.json from GitHub directly, so it stays current anyway.
+# `git diff --quiet` exits 0 (= skip build) when nothing else differs.
+[build]
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/prices.json'"

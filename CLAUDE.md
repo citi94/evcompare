@@ -18,7 +18,7 @@ A single-page web app comparing running costs of an electric car against a petro
 ## Live Data & Presets
 
 - `data/prices.json` holds UK average pump prices (auto-generated) and electricity tariff presets (hand-maintained - edit the `electricity.tariffs` list when the Ofgem cap or network prices change; the updater preserves it).
-- `scripts/update-prices.mjs` (Node 20+, no deps) rebuilds the fuel section from the CMA retailer open-data feeds, or the GOV.UK Fuel Finder API when `FUEL_FINDER_CLIENT_ID`/`FUEL_FINDER_CLIENT_SECRET` are set. `.github/workflows/update-prices.yml` runs it twice daily and commits changes.
+- `scripts/update-prices.mjs` (Node 20+, no deps) rebuilds the fuel section from the CMA retailer open-data feeds, or the GOV.UK Fuel Finder API when `FUEL_FINDER_CLIENT_ID`/`FUEL_FINDER_CLIENT_SECRET` are set. `.github/workflows/update-prices.yml` runs it twice daily and commits changes. Those commits carry `[skip netlify]` and `netlify.toml` ignores price-only changes, so they don't trigger Netlify deploys (which cost credits); the page reads the GitHub copy instead.
 - The page fetches `./data/prices.json` and the raw GitHub copy, using whichever is newer; a snapshot is embedded in `index.html` (`DEFAULT_PRICE_DATA`) as an offline fallback.
 - Car presets (`EV_MODELS` in mi/kWh battery-to-wheel from ev-database.org; `ICE_MODELS` in UK mpg from Fuelly US-gallon figures × 1.20095, filtered to the named engine, 10+ owners) and the 2028 eVED/fuel duty assumptions (`REEVES_2028`) live in `index.html`.
 - `sw.js` is network-first so price updates arrive immediately; bump `CACHE_NAME` on releases.
