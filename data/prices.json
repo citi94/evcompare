@@ -1,35 +1,35 @@
 {
-  "fuelUpdated": "2026-10-21T11:45:20.470Z",
+  "fuelUpdated": "2026-10-22T11:48:23.297Z",
   "fuelSources": [
     {
       "brand": "MFG",
       "stations": 1225,
-      "updated": "2026-10-21T00:00:01.000Z"
+      "updated": "2026-10-22T00:00:01.000Z"
     },
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-10-21T09:54:53.000Z"
+      "updated": "2026-10-22T11:00:00.000Z"
     },
     {
       "brand": "Esso",
       "stations": 194,
-      "updated": "2026-10-21T00:05:14.000Z"
+      "updated": "2026-10-22T00:05:16.000Z"
     },
     {
       "brand": "Moto",
       "stations": 47,
-      "updated": "2026-10-21T09:58:03.000Z"
+      "updated": "2026-10-22T09:58:06.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-10-21T10:45:51.000Z"
+      "updated": "2026-10-22T10:45:51.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-10-20T10:30:15.000Z"
+      "updated": "2026-10-21T10:30:24.000Z"
     }
   ],
   "fuel": {
@@ -42,7 +42,7 @@
       "stations": 2220
     },
     "diesel": {
-      "average": 199.1,
+      "average": 199,
       "median": 199.9,
       "supermarket": 198.9,
       "motorway": 222.9,
@@ -206,6 +206,11 @@
       "date": "2026-10-21",
       "petrol": 173.9,
       "diesel": 199.1
+    },
+    {
+      "date": "2026-10-22",
+      "petrol": 173.9,
+      "diesel": 199
     }
   ],
   "electricity": {
