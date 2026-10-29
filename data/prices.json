@@ -1,38 +1,38 @@
 {
-  "fuelUpdated": "2026-10-28T12:50:18.367Z",
+  "fuelUpdated": "2026-10-29T12:57:10.216Z",
   "fuelSources": [
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-10-28T10:45:27.000Z"
+      "updated": "2026-10-29T11:00:00.000Z"
     },
     {
       "brand": "Esso",
       "stations": 195,
-      "updated": "2026-10-27T23:05:12.000Z"
+      "updated": "2026-10-28T23:05:15.000Z"
     },
     {
       "brand": "Moto",
       "stations": 47,
-      "updated": "2026-10-28T09:58:04.000Z"
+      "updated": "2026-10-29T09:58:53.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-10-28T11:45:13.000Z"
+      "updated": "2026-10-29T11:45:13.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-10-27T11:30:22.000Z"
+      "updated": "2026-10-28T11:30:14.000Z"
     }
   ],
   "fuel": {
     "petrol": {
-      "average": 173.4,
+      "average": 173.3,
       "median": 172.9,
       "supermarket": 173.7,
-      "motorway": 197.9,
+      "motorway": 196.9,
       "cheapest10pc": 168.9,
       "stations": 996
     },
@@ -40,23 +40,23 @@
       "average": 198.6,
       "median": 198.9,
       "supermarket": 198.9,
-      "motorway": 222.9,
+      "motorway": 221.9,
       "cheapest10pc": 194.7,
       "stations": 997
     },
     "superPetrol": {
-      "average": 192,
+      "average": 191.9,
       "median": 191.9,
       "supermarket": 193.9,
-      "motorway": 217.9,
-      "cheapest10pc": 185.9,
+      "motorway": 216.9,
+      "cheapest10pc": 184.9,
       "stations": 649
     },
     "premiumDiesel": {
-      "average": 217.6,
+      "average": 217.5,
       "median": 217.9,
       "supermarket": 218.9,
-      "motorway": 242.9,
+      "motorway": 241.9,
       "cheapest10pc": 211.9,
       "stations": 505
     }
@@ -235,6 +235,11 @@
     {
       "date": "2026-10-28",
       "petrol": 173.4,
+      "diesel": 198.6
+    },
+    {
+      "date": "2026-10-29",
+      "petrol": 173.3,
       "diesel": 198.6
     }
   ],
