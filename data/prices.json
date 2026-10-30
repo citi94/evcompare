@@ -1,5 +1,5 @@
 {
-  "fuelUpdated": "2026-10-30T12:50:51.444Z",
+  "fuelUpdated": "2026-10-30T19:55:55.096Z",
   "fuelSources": [
     {
       "brand": "Asda",
@@ -14,7 +14,7 @@
     {
       "brand": "Moto",
       "stations": 47,
-      "updated": "2026-10-30T09:58:05.000Z"
+      "updated": "2026-10-30T17:58:04.000Z"
     },
     {
       "brand": "Jet",
@@ -32,7 +32,7 @@
       "average": 172.9,
       "median": 172.9,
       "supermarket": 172.9,
-      "motorway": 196.9,
+      "motorway": 194.9,
       "cheapest10pc": 167.9,
       "stations": 995
     },
@@ -40,7 +40,7 @@
       "average": 198.5,
       "median": 198.9,
       "supermarket": 198.9,
-      "motorway": 221.9,
+      "motorway": 219.9,
       "cheapest10pc": 193.9,
       "stations": 996
     },
@@ -48,7 +48,7 @@
       "average": 191.7,
       "median": 191.9,
       "supermarket": 193.9,
-      "motorway": 216.9,
+      "motorway": 214.9,
       "cheapest10pc": 184.9,
       "stations": 648
     },
@@ -56,7 +56,7 @@
       "average": 217.5,
       "median": 217.9,
       "supermarket": 218.9,
-      "motorway": 241.9,
+      "motorway": 239.9,
       "cheapest10pc": 211.9,
       "stations": 504
     }
