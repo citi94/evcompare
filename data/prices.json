@@ -1,64 +1,64 @@
 {
-  "fuelUpdated": "2026-10-31T12:22:55.199Z",
+  "fuelUpdated": "2026-11-01T13:18:13.376Z",
   "fuelSources": [
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-10-31T11:00:00.000Z"
+      "updated": "2026-11-01T11:00:00.000Z"
     },
     {
       "brand": "Esso",
-      "stations": 195,
-      "updated": "2026-10-30T23:05:15.000Z"
+      "stations": 194,
+      "updated": "2026-10-31T23:05:15.000Z"
     },
     {
       "brand": "Moto",
       "stations": 47,
-      "updated": "2026-10-31T09:58:06.000Z"
+      "updated": "2026-11-01T09:58:04.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-10-31T11:45:13.000Z"
+      "updated": "2026-11-01T11:45:13.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-10-30T11:30:23.000Z"
+      "updated": "2026-10-31T11:30:17.000Z"
     }
   ],
   "fuel": {
     "petrol": {
-      "average": 172.9,
-      "median": 172.9,
-      "supermarket": 172.9,
+      "average": 172.4,
+      "median": 171.9,
+      "supermarket": 171.9,
       "motorway": 194.9,
       "cheapest10pc": 167.9,
       "stations": 995
     },
     "diesel": {
-      "average": 198.5,
+      "average": 198.1,
       "median": 198.9,
-      "supermarket": 198.9,
+      "supermarket": 198.7,
       "motorway": 219.9,
       "cheapest10pc": 193.9,
-      "stations": 993
+      "stations": 990
     },
     "superPetrol": {
-      "average": 191.6,
-      "median": 191.9,
-      "supermarket": 193.9,
+      "average": 190.9,
+      "median": 190.9,
+      "supermarket": 192.9,
       "motorway": 214.9,
       "cheapest10pc": 184.9,
-      "stations": 648
+      "stations": 649
     },
     "premiumDiesel": {
-      "average": 217.5,
+      "average": 216.9,
       "median": 217.9,
       "supermarket": 218.9,
       "motorway": 239.9,
       "cheapest10pc": 211.9,
-      "stations": 501
+      "stations": 500
     }
   },
   "fuelHistory": [
@@ -251,6 +251,11 @@
       "date": "2026-10-31",
       "petrol": 172.9,
       "diesel": 198.5
+    },
+    {
+      "date": "2026-11-01",
+      "petrol": 172.4,
+      "diesel": 198.1
     }
   ],
   "electricity": {
