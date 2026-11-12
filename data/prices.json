@@ -1,15 +1,15 @@
 {
-  "fuelUpdated": "2026-11-11T14:16:44.879Z",
+  "fuelUpdated": "2026-11-12T15:09:31.117Z",
   "fuelSources": [
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-11-11T11:00:00.000Z"
+      "updated": "2026-11-12T09:12:52.000Z"
     },
     {
       "brand": "Esso",
       "stations": 195,
-      "updated": "2026-11-11T00:05:14.000Z"
+      "updated": "2026-11-12T00:05:15.000Z"
     },
     {
       "brand": "Moto",
@@ -19,7 +19,7 @@
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-11-11T11:45:13.000Z"
+      "updated": "2026-11-12T11:45:13.000Z"
     },
     {
       "brand": "Morrisons",
@@ -29,36 +29,36 @@
   ],
   "fuel": {
     "petrol": {
-      "average": 169.1,
-      "median": 168.9,
-      "supermarket": 168.9,
+      "average": 168.3,
+      "median": 167.9,
+      "supermarket": 167.9,
       "motorway": 192.9,
-      "cheapest10pc": 163.9,
+      "cheapest10pc": 162.7,
       "stations": 997
     },
     "diesel": {
-      "average": 197.1,
-      "median": 197.9,
-      "supermarket": 197.7,
+      "average": 196.6,
+      "median": 196.9,
+      "supermarket": 196.9,
       "motorway": 218.9,
-      "cheapest10pc": 192.9,
-      "stations": 995
+      "cheapest10pc": 191.9,
+      "stations": 996
     },
     "superPetrol": {
-      "average": 188,
+      "average": 187.7,
       "median": 187.9,
       "supermarket": 190.9,
       "motorway": 212.9,
-      "cheapest10pc": 181.9,
+      "cheapest10pc": 180.9,
       "stations": 651
     },
     "premiumDiesel": {
-      "average": 215.9,
+      "average": 215.8,
       "median": 215.9,
       "supermarket": 217.9,
       "motorway": 238.9,
       "cheapest10pc": 210.9,
-      "stations": 503
+      "stations": 505
     }
   },
   "fuelHistory": [
@@ -301,6 +301,11 @@
       "date": "2026-11-11",
       "petrol": 169.1,
       "diesel": 197.1
+    },
+    {
+      "date": "2026-11-12",
+      "petrol": 168.3,
+      "diesel": 196.6
     }
   ],
   "electricity": {
