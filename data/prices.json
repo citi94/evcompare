@@ -1,59 +1,59 @@
 {
-  "fuelUpdated": "2026-11-15T13:53:48.382Z",
+  "fuelUpdated": "2026-11-16T15:40:44.086Z",
   "fuelSources": [
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-11-15T11:00:00.000Z"
+      "updated": "2026-11-16T10:23:25.000Z"
     },
     {
       "brand": "Esso",
       "stations": 195,
-      "updated": "2026-11-15T03:02:08.000Z"
+      "updated": "2026-11-16T00:05:14.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-11-15T11:45:13.000Z"
+      "updated": "2026-11-16T11:45:12.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-11-14T11:30:09.000Z"
+      "updated": "2026-11-15T11:30:09.000Z"
     }
   ],
   "fuel": {
     "petrol": {
-      "average": 166.4,
-      "median": 165.9,
-      "supermarket": 166.9,
+      "average": 164.9,
+      "median": 164.9,
+      "supermarket": 164.9,
       "motorway": null,
       "cheapest10pc": 159.7,
       "stations": 997
     },
     "diesel": {
-      "average": 195.1,
-      "median": 195.9,
-      "supermarket": 195.9,
+      "average": 194.3,
+      "median": 194.9,
+      "supermarket": 194.9,
       "motorway": null,
       "cheapest10pc": 189.7,
-      "stations": 991
+      "stations": 988
     },
     "superPetrol": {
-      "average": 187.1,
-      "median": 187.9,
-      "supermarket": 190.9,
+      "average": 184.9,
+      "median": 184.9,
+      "supermarket": 185.9,
       "motorway": null,
       "cheapest10pc": 178.9,
       "stations": 651
     },
     "premiumDiesel": {
-      "average": 215.5,
-      "median": 215.9,
-      "supermarket": 217.9,
+      "average": 214.2,
+      "median": 214.9,
+      "supermarket": 215.9,
       "motorway": null,
       "cheapest10pc": 208.9,
-      "stations": 500
+      "stations": 498
     }
   },
   "fuelHistory": [
@@ -316,6 +316,11 @@
       "date": "2026-11-15",
       "petrol": 166.4,
       "diesel": 195.1
+    },
+    {
+      "date": "2026-11-16",
+      "petrol": 164.9,
+      "diesel": 194.3
     }
   ],
   "electricity": {
