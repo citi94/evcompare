@@ -1,59 +1,59 @@
 {
-  "fuelUpdated": "2026-11-16T15:40:44.086Z",
+  "fuelUpdated": "2026-11-17T15:57:04.673Z",
   "fuelSources": [
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-11-16T10:23:25.000Z"
+      "updated": "2026-11-17T11:00:00.000Z"
     },
     {
       "brand": "Esso",
-      "stations": 195,
-      "updated": "2026-11-16T00:05:14.000Z"
+      "stations": 194,
+      "updated": "2026-11-17T00:05:13.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-11-16T11:45:12.000Z"
+      "updated": "2026-11-17T11:45:12.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-11-15T11:30:09.000Z"
+      "updated": "2026-11-16T11:30:09.000Z"
     }
   ],
   "fuel": {
     "petrol": {
-      "average": 164.9,
-      "median": 164.9,
+      "average": 164.5,
+      "median": 163.9,
       "supermarket": 164.9,
       "motorway": null,
       "cheapest10pc": 159.7,
-      "stations": 997
+      "stations": 996
     },
     "diesel": {
-      "average": 194.3,
+      "average": 194,
       "median": 194.9,
       "supermarket": 194.9,
       "motorway": null,
       "cheapest10pc": 189.7,
-      "stations": 988
+      "stations": 995
     },
     "superPetrol": {
-      "average": 184.9,
-      "median": 184.9,
+      "average": 184.3,
+      "median": 183.9,
       "supermarket": 185.9,
       "motorway": null,
-      "cheapest10pc": 178.9,
-      "stations": 651
+      "cheapest10pc": 177.9,
+      "stations": 650
     },
     "premiumDiesel": {
-      "average": 214.2,
-      "median": 214.9,
+      "average": 213.4,
+      "median": 213.9,
       "supermarket": 215.9,
       "motorway": null,
-      "cheapest10pc": 208.9,
-      "stations": 498
+      "cheapest10pc": 207.9,
+      "stations": 513
     }
   },
   "fuelHistory": [
@@ -321,6 +321,11 @@
       "date": "2026-11-16",
       "petrol": 164.9,
       "diesel": 194.3
+    },
+    {
+      "date": "2026-11-17",
+      "petrol": 164.5,
+      "diesel": 194
     }
   ],
   "electricity": {
