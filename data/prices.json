@@ -1,59 +1,59 @@
 {
-  "fuelUpdated": "2026-11-17T15:57:04.673Z",
+  "fuelUpdated": "2026-11-18T15:36:16.225Z",
   "fuelSources": [
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-11-17T11:00:00.000Z"
+      "updated": "2026-11-18T10:43:27.000Z"
     },
     {
       "brand": "Esso",
       "stations": 194,
-      "updated": "2026-11-17T00:05:13.000Z"
+      "updated": "2026-11-18T00:05:17.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-11-17T11:45:12.000Z"
+      "updated": "2026-11-18T11:45:13.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-11-16T11:30:09.000Z"
+      "updated": "2026-11-17T11:30:12.000Z"
     }
   ],
   "fuel": {
     "petrol": {
-      "average": 164.5,
-      "median": 163.9,
-      "supermarket": 164.9,
+      "average": 163.8,
+      "median": 162.9,
+      "supermarket": 162.9,
       "motorway": null,
-      "cheapest10pc": 159.7,
+      "cheapest10pc": 158.7,
       "stations": 996
     },
     "diesel": {
-      "average": 194,
-      "median": 194.9,
-      "supermarket": 194.9,
+      "average": 193.6,
+      "median": 193.9,
+      "supermarket": 193.9,
       "motorway": null,
       "cheapest10pc": 189.7,
       "stations": 995
     },
     "superPetrol": {
-      "average": 184.3,
+      "average": 183.5,
       "median": 183.9,
       "supermarket": 185.9,
       "motorway": null,
-      "cheapest10pc": 177.9,
+      "cheapest10pc": 176.9,
       "stations": 650
     },
     "premiumDiesel": {
-      "average": 213.4,
+      "average": 213,
       "median": 213.9,
       "supermarket": 215.9,
       "motorway": null,
-      "cheapest10pc": 207.9,
-      "stations": 513
+      "cheapest10pc": 206.9,
+      "stations": 512
     }
   },
   "fuelHistory": [
@@ -326,6 +326,11 @@
       "date": "2026-11-17",
       "petrol": 164.5,
       "diesel": 194
+    },
+    {
+      "date": "2026-11-18",
+      "petrol": 163.8,
+      "diesel": 193.6
     }
   ],
   "electricity": {
