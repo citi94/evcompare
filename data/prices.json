@@ -1,25 +1,25 @@
 {
-  "fuelUpdated": "2026-11-21T14:36:38.169Z",
+  "fuelUpdated": "2026-11-22T14:31:08.219Z",
   "fuelSources": [
     {
       "brand": "Asda",
       "stations": 790,
-      "updated": "2026-11-21T11:00:00.000Z"
+      "updated": "2026-11-22T11:00:00.000Z"
     },
     {
       "brand": "Esso",
       "stations": 195,
-      "updated": "2026-11-21T00:05:14.000Z"
+      "updated": "2026-11-22T00:05:14.000Z"
     },
     {
       "brand": "Jet",
       "stations": 11,
-      "updated": "2026-11-21T11:45:13.000Z"
+      "updated": "2026-11-22T11:45:13.000Z"
     },
     {
       "brand": "Morrisons",
       "stations": 1,
-      "updated": "2026-11-20T11:30:09.000Z"
+      "updated": "2026-11-21T11:30:09.000Z"
     }
   ],
   "fuel": {
@@ -48,12 +48,12 @@
       "stations": 651
     },
     "premiumDiesel": {
-      "average": 210.3,
+      "average": 210.4,
       "median": 209.9,
       "supermarket": 211.9,
       "motorway": null,
       "cheapest10pc": 205.9,
-      "stations": 517
+      "stations": 515
     }
   },
   "fuelHistory": [
@@ -344,6 +344,11 @@
     },
     {
       "date": "2026-11-21",
+      "petrol": 160.1,
+      "diesel": 191.8
+    },
+    {
+      "date": "2026-11-22",
       "petrol": 160.1,
       "diesel": 191.8
     }
